@@ -894,87 +894,184 @@ function PopularSection() {
 function ParentsSection() {
   const ref = useRef<HTMLDivElement>(null);
   const inView = useInView(ref);
+
   const examples = [
-    { icon: '🔭', title: 'Ilmiy hikoya', desc: 'Farzandingiz uchun qiziqarli ilmiy sarguzasht' },
-    { icon: '🌿', title: 'Tarbiyaviy ertak', desc: 'Yaxshi qadriyatlar o\'rgatuvchi ertaklar' },
-    { icon: '🦸', title: 'Qahramonli sarguzasht', desc: 'Farzandingiz bosh qahramon bo\'ladi' },
+    {
+      circleColor: 'rgba(124,58,237,0.4)',
+      title: 'Ilmiy hikoya',
+      desc: 'Farzandingiz uchun qiziqarli ilmiy sarguzasht hikoyalari.',
+      icon: (
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+          <path d="M4 20 15 8" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round"/>
+          <rect x="13.2" y="6.2" width="6" height="2.4" rx="1.2" transform="rotate(45 13.2 6.2)" fill="currentColor"/>
+          <circle cx="6" cy="18" r="2.4" stroke="currentColor" strokeWidth="1.6"/>
+          <path d="M17 4.5 19.5 7" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round"/>
+        </svg>
+      ),
+    },
+    {
+      circleColor: 'rgba(219,39,119,0.35)',
+      title: 'Tarbiyaviy ertak',
+      desc: "Yaxshi qadriyatlar o'rgatuvchi ertaklar to'plami.",
+      icon: (
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+          <path d="M4 5.5c2-1 5-1 8 0v13c-3-1-6-1-8 0v-13Z" stroke="currentColor" strokeWidth="1.6" strokeLinejoin="round"/>
+          <path d="M20 5.5c-2-1-5-1-8 0v13c3-1 6-1 8 0v-13Z" stroke="currentColor" strokeWidth="1.6" strokeLinejoin="round"/>
+        </svg>
+      ),
+    },
+    {
+      circleColor: 'rgba(124,58,237,0.4)',
+      title: 'Qahramonli sarguzasht',
+      desc: "Farzandingiz bosh qahramon bo'ladigan sarguzashtlar.",
+      icon: (
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+          <path d="M12 3 19 6v5.5c0 4.5-3 7.7-7 9-4-1.3-7-4.5-7-9V6l7-3Z" stroke="currentColor" strokeWidth="1.6" strokeLinejoin="round"/>
+          <path d="M9.5 12.5 11 14l4-4" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"/>
+        </svg>
+      ),
+    },
   ];
 
   return (
-    <section id="ota-onalar" style={{
+    <section id="ota-onalar" ref={ref} style={{
       padding: 'clamp(60px,8vw,100px) clamp(20px,5vw,80px)',
       position: 'relative', overflow: 'hidden',
     }}>
-      {/* Decorative moon */}
-      <div style={{
-        position: 'absolute', top: -60, right: -60,
-        width: 300, height: 300, borderRadius: '50%',
-        background: 'radial-gradient(circle at 35% 35%, rgba(243,216,156,0.08) 0%, transparent 70%)',
-        border: '1px solid rgba(243,216,156,0.06)',
-        pointerEvents: 'none',
-      }} />
-      <div style={{ maxWidth: 1200, margin: '0 auto' }}>
+      <div style={{ maxWidth: 1300, margin: '0 auto' }}>
         <div style={{
-          background: 'linear-gradient(135deg, rgba(107,33,168,0.2) 0%, rgba(13,10,26,0.6) 50%, rgba(76,29,149,0.2) 100%)',
+          position: 'relative',
+          borderRadius: 28,
           border: '1px solid rgba(168,85,247,0.2)',
-          borderRadius: 28, padding: 'clamp(32px,5vw,64px)',
-          position: 'relative', overflow: 'hidden',
+          overflow: 'hidden', // rasm cardan chiqmasligi uchun
+          padding: 'clamp(28px,5vw,56px)',
         }}>
+          {/* Orqa fon rasmi */}
           <div style={{
-            position: 'absolute', top: 0, left: 0, right: 0, height: 2,
+            position: 'absolute', inset: 0,
+            backgroundImage: 'url(/ota-ona.png)',
+            backgroundSize: 'cover',
+            backgroundPosition: 'center',
+            zIndex: 0,
+          }} />
+          {/* Matn o'qilishi uchun qorong'ulashtiruvchi qatlam */}
+          <div style={{
+            position: 'absolute', inset: 0,
+            background: 'linear-gradient(90deg, rgba(10,7,20,0.92) 0%, rgba(10,7,20,0.75) 45%, rgba(10,7,20,0.5) 75%, rgba(10,7,20,0.6) 100%)',
+            zIndex: 1,
+          }} />
+          {/* Tepadagi porlash chizig'i */}
+          <div style={{
+            position: 'absolute', top: 0, left: 0, right: 0, height: 2, zIndex: 2,
             background: 'linear-gradient(90deg, transparent, #A855F7, #F3D89C, #A855F7, transparent)',
           }} />
-          <div ref={ref} style={{ textAlign: 'center', marginBottom: 'clamp(32px,5vw,48px)' }}>
-            <div style={{ fontSize: '3rem', marginBottom: 16 }}>👨‍👩‍👧</div>
-            <p style={{
-              fontFamily: "'Cinzel',serif", fontSize: '0.75rem',
-              letterSpacing: '0.2em', color: '#7C3AED', marginBottom: 12,
-              transition: 'all 0.8s ease', opacity: inView ? 1 : 0,
-            }}> OTA-ONALAR UCHUN</p>
-            <h2 style={{
-              fontFamily: "'Cinzel',serif", fontSize: 'clamp(1.6rem,4vw,2.8rem)',
-              fontWeight: 700, color: '#F1E8FF', marginBottom: 16, lineHeight: 1.3,
-              transition: 'all 0.8s ease 0.1s', opacity: inView ? 1 : 0,
+
+          {/* Kontent — rasm ustida */}
+          <div style={{ position: 'relative', zIndex: 2 }}>
+            <div style={{
+              maxWidth: 640,
+              transition: 'all 0.8s ease',
+              opacity: inView ? 1 : 0,
               transform: inView ? 'translateY(0)' : 'translateY(20px)',
-            }}>Farzandingiz uchun o'z<br /><span style={{ background: 'linear-gradient(135deg,#F3D89C,#A855F7)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text' }}>hikoyangizni yarating</span></h2>
-            <p style={{
-              fontFamily: "'Nunito',sans-serif", fontSize: 'clamp(0.9rem,2vw,1.05rem)',
-              color: '#9B8EC4', lineHeight: 1.8, maxWidth: 560, margin: '0 auto',
-              transition: 'all 0.8s ease 0.2s', opacity: inView ? 1 : 0,
+              marginBottom: 'clamp(32px,5vw,48px)',
             }}>
-              Bolangizning sevimli qahramoni, rangi, va orzulari asosida maxsus ertak yarating. Farzandingiz har kuni yangi sarguzasht kashf etsin.
-            </p>
-          </div>
-          <div style={{
-            display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%,220px),1fr))',
-            gap: 'clamp(16px,2.5vw,24px)',
-          }}>
-            {examples.map((ex, i) => (
-              <div key={i} style={{
-                background: 'rgba(255,255,255,0.04)',
-                border: '1px solid rgba(168,85,247,0.2)',
-                borderRadius: 16, padding: 'clamp(20px,3vw,28px)',
-                textAlign: 'center',
-                transition: 'all 0.8s ease', transitionDelay: `${0.1 + i * 0.1}s`,
-                opacity: inView ? 1 : 0,
-                transform: inView ? 'translateY(0)' : 'translateY(20px)',
+              <p style={{
+                fontFamily: "'Cinzel',serif", fontSize: '0.78rem',
+                letterSpacing: '0.2em', color: '#C4B5FD', marginBottom: 16,
+              }}>✦ OTA-ONALAR UCHUN</p>
+              <h2 style={{
+                fontFamily: "'Cinzel',serif", fontSize: 'clamp(1.8rem,3.6vw,2.8rem)',
+                fontWeight: 700, color: '#F1E8FF', marginBottom: 20, lineHeight: 1.3,
               }}>
-                <div style={{ fontSize: '2.2rem', marginBottom: 12 }}>{ex.icon}</div>
-                <h4 style={{
-                  fontFamily: "'Cinzel',serif", fontSize: 'clamp(0.9rem,1.8vw,1rem)',
-                  fontWeight: 600, color: '#E9D5FF', marginBottom: 8,
-                }}>{ex.title}</h4>
-                <p style={{ fontFamily: "'Nunito',sans-serif", fontSize: '0.85rem', color: '#7C6A9E', lineHeight: 1.6 }}>{ex.desc}</p>
-              </div>
-            ))}
+                Farzandingiz uchun o'z{' '}
+                <span style={{
+                  background: 'linear-gradient(135deg,#F3D89C,#A855F7)',
+                  WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text',
+                }}>hikoyangizni</span>{' '}
+                yarating
+              </h2>
+              <p style={{
+                fontFamily: "'Nunito',sans-serif", fontSize: 'clamp(0.9rem,1.6vw,1.05rem)',
+                color: '#D8CDEE', lineHeight: 1.8, marginBottom: 32,
+              }}>
+                Bolangizning sevimli qahramoni, rangi, va orzulari asosida maxsus ertak yarating. Farzandingiz har kuni yangi sarguzasht kashf etsin.
+              </p>
+              <button style={{
+                display: 'inline-flex', alignItems: 'center', gap: 10,
+                padding: 'clamp(12px,2vw,16px) clamp(24px,3vw,32px)',
+                background: 'linear-gradient(135deg, #7C3AED 0%, #A855F7 100%)',
+                border: 'none', borderRadius: 99, cursor: 'pointer',
+                fontFamily: "'Nunito',sans-serif", fontWeight: 700,
+                fontSize: 'clamp(0.9rem,1.6vw,1rem)',
+                color: '#fff', letterSpacing: '0.02em',
+                boxShadow: '0 0 30px rgba(168,85,247,0.5)',
+                transition: 'all 0.3s ease',
+              }}
+                onMouseEnter={e => { e.currentTarget.style.transform = 'translateY(-2px)'; e.currentTarget.style.boxShadow = '0 0 45px rgba(168,85,247,0.7)'; }}
+                onMouseLeave={e => { e.currentTarget.style.transform = 'translateY(0)'; e.currentTarget.style.boxShadow = '0 0 30px rgba(168,85,247,0.5)'; }}
+              >✦ Hikoya yaratishni boshlang</button>
+            </div>
+
+            {/* Pastki qator — 3 karta, rasm ustida */}
+            <div style={{
+              display: 'grid',
+              gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%,260px),1fr))',
+              gap: 'clamp(14px,2vw,20px)',
+            }}>
+              {examples.map((ex, i) => (
+                <div key={i} style={{
+                  background: 'rgba(20,14,35,0.65)',
+                  backdropFilter: 'blur(8px)',
+                  WebkitBackdropFilter: 'blur(8px)',
+                  border: '1px solid rgba(168,85,247,0.25)',
+                  borderRadius: 16,
+                  padding: 'clamp(18px,2.5vw,24px)',
+                  display: 'flex', alignItems: 'flex-start', gap: 14,
+                  position: 'relative',
+                  transition: 'all 0.5s ease', transitionDelay: `${0.1 + i * 0.1}s`,
+                  opacity: inView ? 1 : 0,
+                  transform: inView ? 'translateY(0)' : 'translateY(20px)',
+                }}
+                  onMouseEnter={e => {
+                    e.currentTarget.style.borderColor = 'rgba(168,85,247,0.5)';
+                    e.currentTarget.style.background = 'rgba(30,20,50,0.75)';
+                  }}
+                  onMouseLeave={e => {
+                    e.currentTarget.style.borderColor = 'rgba(168,85,247,0.25)';
+                    e.currentTarget.style.background = 'rgba(20,14,35,0.65)';
+                  }}
+                >
+                  <div style={{
+                    width: 48, height: 48, minWidth: 48, borderRadius: '50%',
+                    background: ex.circleColor,
+                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    color: '#F1E8FF',
+                  }}>
+                    {ex.icon}
+                  </div>
+                  <div style={{ flex: 1, paddingRight: 20 }}>
+                    <h4 style={{
+                      fontFamily: "'Cinzel',serif", fontSize: 'clamp(0.95rem,1.6vw,1.05rem)',
+                      fontWeight: 600, color: '#F1E8FF', marginBottom: 6,
+                    }}>{ex.title}</h4>
+                    <p style={{
+                      fontFamily: "'Nunito',sans-serif", fontSize: '0.82rem',
+                      color: '#C4B5FD', lineHeight: 1.6,
+                    }}>{ex.desc}</p>
+                  </div>
+                  <span style={{
+                    position: 'absolute', right: 18, bottom: 18,
+                    color: '#A855F7', fontSize: '1.1rem',
+                  }}>→</span>
+                </div>
+              ))}
+            </div>
           </div>
         </div>
       </div>
     </section>
   );
 }
-
 // ─── FOOTER CTA ──────────────────────────────────────────────────────────────
 function FooterCTA() {
   const ref = useRef<HTMLDivElement>(null);
@@ -998,7 +1095,7 @@ function FooterCTA() {
           fontFamily: "'Cinzel',serif", fontSize: '0.75rem',
           letterSpacing: '0.2em', color: '#7C3AED', marginBottom: 20,
           transition: 'all 0.8s ease', opacity: inView ? 1 : 0,
-        }}>✨ BUGUN BOSHLANG</p>
+        }}> BUGUN BOSHLANG</p>
         <h2 style={{
           fontFamily: "'Cinzel Decorative',serif",
           fontSize: 'clamp(1.6rem,5vw,3.5rem)',
@@ -1034,7 +1131,7 @@ function FooterCTA() {
         }}
           onMouseEnter={e => { e.currentTarget.style.transform = 'translateY(-4px) scale(1.05)'; e.currentTarget.style.boxShadow = '0 0 80px rgba(168,85,247,0.7), 0 0 160px rgba(168,85,247,0.3)'; }}
           onMouseLeave={e => { e.currentTarget.style.transform = 'translateY(0) scale(1)'; e.currentTarget.style.boxShadow = '0 0 60px rgba(168,85,247,0.5), 0 0 120px rgba(168,85,247,0.2)'; }}
-        >✨ Yaratishni boshlash</button>
+        > Yaratishni boshlash</button>
       </div>
     </section>
   );
@@ -1042,39 +1139,181 @@ function FooterCTA() {
 
 // ─── FOOTER ──────────────────────────────────────────────────────────────────
 function Footer() {
+  const scrollToTop = () => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  const socials = [
+    {
+      name: 'Telefon',
+      href: 'tel:+998771560522', 
+      icon: (
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+          <path d="M6.6 10.8c1.4 2.8 3.8 5.2 6.6 6.6l2.2-2.2c.3-.3.7-.4 1-.2 1.1.4 2.3.6 3.6.6.6 0 1 .4 1 1V20c0 .6-.4 1-1 1C10.6 21 3 13.4 3 4c0-.6.4-1 1-1h3.4c.6 0 1 .4 1 1 0 1.3.2 2.5.6 3.6.1.3 0 .7-.2 1L6.6 10.8Z" stroke="currentColor" strokeWidth="1.6" strokeLinejoin="round"/>
+        </svg>
+      ),
+    },
+    {
+      name: 'Telegram',
+      href: 'https://t.me/nabiee_27', 
+      icon: (
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+          <path d="M22 4.5 2.4 12.1c-.6.24-.6.85 0 1.06l5 1.66 1.9 6.1c.16.5.8.6 1.1.16l2.6-3.4 5.1 3.8c.6.44 1.5.1 1.6-.6L23 5.4c.14-.7-.4-1.2-1-.9Z" fill="currentColor"/>
+        </svg>
+      ),
+    },
+    {
+      name: 'Instagram',
+      href: 'https://instagram.com/02_shovkatov', // ← o'z havolangizni qo'ying
+      icon: (
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+          <rect x="3" y="3" width="18" height="18" rx="5" stroke="currentColor" strokeWidth="1.6"/>
+          <circle cx="12" cy="12" r="4.2" stroke="currentColor" strokeWidth="1.6"/>
+          <circle cx="17.3" cy="6.7" r="1.1" fill="currentColor"/>
+        </svg>
+      ),
+    },
+  ];
+
+  const quickLinks = [
+    { label: 'Bosh sahifa', onClick: scrollToTop },
+    { label: 'Biz haqimizda', href: '#biz-haqimizda' },
+    { label: 'Bog\'lanish', href: '#boglanish' },
+  ];
+
   return (
     <footer style={{
+      position: 'relative',
+      overflow: 'hidden',
       borderTop: '1px solid rgba(168,85,247,0.15)',
-      padding: 'clamp(32px,5vw,48px) clamp(20px,5vw,80px)',
-      display: 'flex', justifyContent: 'space-between', alignItems: 'center',
-      flexWrap: 'wrap', gap: 20,
+      padding: 'clamp(48px,6vw,72px) clamp(20px,5vw,80px) clamp(24px,3vw,32px)',
     }}>
-      <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-        <img src="/logo.png" alt="logo" style={{ width: 32, height: 32, borderRadius: '50%', objectFit: 'cover', border: '2px solid rgba(168,85,247,0.5)' }} />
-        <span style={{
-          fontFamily: "'Cinzel Decorative',serif", fontSize: '0.95rem', fontWeight: 700,
-          background: 'linear-gradient(135deg, #F3D89C, #A855F7)',
-          WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text',
-        }}>Xayollar Ro'yosi</span>
+      {/* Xira fon rasmi */}
+      <div style={{
+        position: 'absolute', inset: 0,
+        backgroundImage: 'url(/fonn.png)', // ← haqiqiy fayl nomingiz
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+        filter: 'blur(6px) saturate(110%)',
+        opacity: 0.55,
+        transform: 'scale(1.05)',
+        pointerEvents: 'none',
+      }} />
+      {/* Glass (shisha) effekti — rasm ko'rinadi, lekin yengil xiralashadi */}
+      <div style={{
+        position: 'absolute', inset: 0,
+        background: 'rgba(13,10,26,0.35)',
+        backdropFilter: 'blur(3px)',
+        WebkitBackdropFilter: 'blur(3px)',
+        pointerEvents: 'none',
+      }} />
+
+      <div style={{
+        position: 'relative', zIndex: 1,
+        maxWidth: 1200, margin: '0 auto',
+        display: 'grid',
+        gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%,220px),1fr))',
+        gap: 'clamp(32px,5vw,48px)',
+        marginBottom: 'clamp(32px,5vw,48px)',
+      }}>
+        {/* Logo + tavsif */}
+        <div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 12 }}>
+            <img src="/logo.png" alt="logo" style={{
+              width: 36, height: 36, borderRadius: '50%', objectFit: 'cover',
+              border: '2px solid rgba(168,85,247,0.5)',
+            }} />
+            <span style={{
+              fontFamily: "'Cinzel Decorative',serif", fontSize: '1rem', fontWeight: 700,
+              background: 'linear-gradient(135deg, #F3D89C, #A855F7)',
+              WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text',
+            }}>Xayollar Ro'yosi</span>
+          </div>
+          <p style={{
+            fontFamily: "'Nunito',sans-serif", fontSize: '0.85rem',letterSpacing: '0.1em',
+            color: '#9B8EC4', lineHeight: 1.7, maxWidth: 260,
+          }}>
+            Yangi olam eshigi! <br></br>༼ つ ◕_◕ ༽つ
+          </p>
+        </div>
+
+        {/* Tezkor havolalar */}
+        <div>
+          <h5 style={{
+            fontFamily: "'Cinzel',serif", fontSize: '0.85rem', letterSpacing: '0.1em',
+            color: '#C4B5FD', marginBottom: 16, textTransform: 'uppercase',
+          }}>Tezkor havolalar</h5>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+            {quickLinks.map(l => (
+              <a
+                key={l.label}
+                href={l.href || '#'}
+                onClick={l.onClick ? (e => { e.preventDefault(); l.onClick(); }) : undefined}
+                style={{
+                  fontFamily: "'Nunito',sans-serif", fontSize: '0.85rem',
+                  color: '#7C6A9E', textDecoration: 'none', transition: 'color 0.2s', width: 'fit-content',
+                }}
+                onMouseEnter={e => (e.currentTarget.style.color = '#A855F7')}
+                onMouseLeave={e => (e.currentTarget.style.color = '#7C6A9E')}
+              >{l.label}</a>
+            ))}
+          </div>
+        </div>
+
+        {/* Bog'lanish */}
+        <div>
+          <h5 style={{
+            fontFamily: "'Cinzel',serif", fontSize: '0.85rem', letterSpacing: '0.1em',
+            color: '#C4B5FD', marginBottom: 16, textTransform: 'uppercase',
+          }}>Aloqa</h5>
+          <div style={{ display: 'flex', gap: 14 }}>
+            {socials.map(s => (
+              <a
+                key={s.name}
+                href={s.href}
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label={s.name}
+                style={{
+                  width: 38, height: 38, borderRadius: '50%',
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  background: 'rgba(168,85,247,0.12)',
+                  border: '1px solid rgba(168,85,247,0.25)',
+                  color: '#C4B5FD',
+                  transition: 'all 0.2s',
+                }}
+                onMouseEnter={e => {
+                  e.currentTarget.style.background = 'linear-gradient(135deg, #7C3AED, #A855F7)';
+                  e.currentTarget.style.color = '#fff';
+                  e.currentTarget.style.transform = 'translateY(-3px)';
+                }}
+                onMouseLeave={e => {
+                  e.currentTarget.style.background = 'rgba(168,85,247,0.12)';
+                  e.currentTarget.style.color = '#C4B5FD';
+                  e.currentTarget.style.transform = 'translateY(0)';
+                }}
+              >{s.icon}</a>
+            ))}
+          </div>
+        </div>
       </div>
-      <p style={{ fontFamily: "'Nunito',sans-serif", fontSize: '0.8rem', color: '#4A3B6B', textAlign: 'center' }}>
-        © 2024 Xayollar Ro'yosi · Barcha huquqlar himoyalangan
-      </p>
-      <div style={{ display: 'flex', gap: 20 }}>
-        {['Instagram', 'TikTok', 'Telegram'].map(s => (
-          <a key={s} href="#" style={{
-            fontFamily: "'Nunito',sans-serif", fontSize: '0.8rem', color: '#6B5A8E',
-            textDecoration: 'none', transition: 'color 0.2s',
-          }}
-            onMouseEnter={e => (e.currentTarget.style.color = '#A855F7')}
-            onMouseLeave={e => (e.currentTarget.style.color = '#6B5A8E')}
-          >{s}</a>
-        ))}
+
+      {/* Pastki qator */}
+      <div style={{
+        position: 'relative', zIndex: 1,
+        maxWidth: 1200, margin: '0 auto',
+        paddingTop: 'clamp(20px,3vw,28px)',
+        borderTop: '1px solid rgba(215, 203, 226, 0.1)',
+        textAlign: 'center',
+      }}>
+        <p style={{ fontFamily: "'Nunito',sans-serif", fontSize: '0.78rem', color: '#7b6a9e' }}>
+          © 2026 Xayollar Ro'yosi · Barcha huquqlar himoyalangan
+        </p>
       </div>
     </footer>
   );
 }
-
+// ─── HOME (asosiy sahifa) ────────────────────────────────────────────────────
 export default function Home() {
   const [showIntro, setShowIntro] = useState(true);
   const [mounted, setMounted] = useState(false);
