@@ -1,5 +1,5 @@
-import React, { useState, useEffect, useRef } from 'react';
-
+import React, { useState, useEffect, useRef, useMemo} from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 // ─── TYPES ───────────────────────────────────────────────────────────────────
 interface Star { x: number; y: number; size: number; opacity: number; speed: number; }
 interface Particle { x: number; y: number; vx: number; vy: number; size: number; opacity: number; color: string; }
@@ -474,116 +474,296 @@ function Hero({ scrollY }: { scrollY: number }) {
   );
 }
 
-// ─── FEATURES CARD ───────────────────────────────────────────────────────────
-function FeatureCard({ icon, title, desc, delay }: { icon: string; title: string; desc: string; delay: number }) {
-  const ref = useRef<HTMLDivElement>(null);
-  const inView = useInView(ref);
-  const [hovered, setHovered] = useState(false);
+interface GrowthCard { number: string; title: string; desc: string; img: string; }
+
+const GROWTH_CARDS: GrowthCard[] = [
+  { number: '01', title: "Hikoya yozish", desc: "O'z g'oyalaringizni hikoyaga aylantiring.", img: '/0.png' },
+  { number: '02', title: "Komiks & Fanfic /nyaratish", desc: "Rasmlar bilan hikoyangizni jonlantiring.", img: '/2.png' },
+  { number: '03', title: "Rasm chizish", desc: "Ijodingizni rasmda ifoda eting.", img: '/3.png' },
+  { number: '04', title: "Tayyor /nelementlar", desc: "Tayyor qahramon va manzaralarni yig'ing.", img: '/4.png' },
+  { number: '05', title: "Qahramonlar /nyaratish", desc: "Ko'rinishi va xarakterini belgilang.", img: '/5.png' },
+  { number: '06', title: "Ovoz berish", desc: "Dialoglar yozing va jonlantiring.", img: '/6.png' },
+  { number: '07', title: "Musiqa va /neffektlar", desc: "Mos musiqa va effektlar qo'shing.", img: '/7.png' },
+  { number: '08', title: "Animatsiya /nyaratish", desc: "Hikoyangizni videoga aylantiring.", img: '/8.png' },
+];
+
+const SLIDE_INTERVAL = 2800; // har bir slayd necha millisoniya turadi
+
+// gapning ikkiga bo'lingan rangi
+const TWO_TONE = ['#C9A876', '#D8B4FE'];
+
+// orqa fondagi miltillovchi yulduzlar — o'zgarishsiz
+function OrbitStars({ count = 90 }: { count?: number }) {
+  const stars = useMemo(() => Array.from({ length: count }, () => {
+    const big = Math.random() > 0.85;
+    return {
+      x: Math.random() * 100,
+      y: Math.random() * 100,
+      size: big ? Math.random() * 2.5 + 2.5 : Math.random() * 1.6 + 0.8,
+      duration: Math.random() * 3 + 2.2,
+      delay: Math.random() * 5,
+      big,
+    };
+  }), [count]);
+
+  return (
+    <div style={{ position: 'absolute', inset: 0, zIndex: 0, pointerEvents: 'none' }} aria-hidden="true">
+      {stars.map((s, i) => (
+        <span
+          key={i}
+          style={{
+            position: 'absolute',
+            left: `${s.x}%`,
+            top: `${s.y}%`,
+            width: s.size,
+            height: s.size,
+            borderRadius: '50%',
+            background: s.big ? '#F3D89C' : '#ffffff',
+            boxShadow: s.big
+              ? '0 0 10px 2px rgba(243,216,156,0.7)'
+              : '0 0 6px 1px rgba(255,255,255,0.6)',
+            animation: `orbit-twinkle ${s.duration}s ease-in-out ${s.delay}s infinite`,
+          }}
+        />
+      ))}
+    </div>
+  );
+}
+
+function SlideText({ text, delayStep = 0.014, as: Tag = 'span', twoTone = false }: { text: string; delayStep?: number; as?: any; twoTone?: boolean }) {
+  const lines = text.split('/n');
+  const totalChars = lines.join('').length;
+  const mid = Math.ceil(totalChars / 2);
+  let globalIndex = 0;
+
+  return (
+    <Tag style={{ display: 'inline-block', overflow: 'hidden' }}>
+      {lines.map((line, lineIdx) => (
+        <React.Fragment key={`line-${lineIdx}`}>
+          {lineIdx > 0 && <br />}
+          {[...line].map((ch, i) => {
+            const currentIndex = globalIndex;
+            globalIndex++;
+            return (
+              <motion.span
+                key={`${lineIdx}-${i}`}
+                style={{
+                  display: 'inline-block',
+                  color: twoTone ? (currentIndex < mid ? TWO_TONE[0] : TWO_TONE[1]) : undefined,
+                }}
+                initial={{ y: '110%', opacity: 0 }}
+                animate={{ y: '0%', opacity: 1 }}
+                exit={{ y: '-110%', opacity: 0 }}
+                transition={{ duration: 0.4, delay: currentIndex * delayStep, ease: [0.22, 1, 0.36, 1] }}
+              >
+                {ch === ' ' ? '\u00A0' : ch}
+              </motion.span>
+            );
+          })}
+        </React.Fragment>
+      ))}
+    </Tag>
+  );
+}
+
+function OrbitFeatures() {
+  const total = GROWTH_CARDS.length;
+  const [index, setIndex] = useState(0);
+  const [paused, setPaused] = useState(false);
+  const pausedRef = useRef(paused);
+  useEffect(() => { pausedRef.current = paused; }, [paused]);
+
+  useEffect(() => {
+    const id = setInterval(() => {
+      if (!pausedRef.current) setIndex((i) => (i + 1) % total);
+    }, SLIDE_INTERVAL);
+    return () => clearInterval(id);
+  }, [total]);
+
+  const card = GROWTH_CARDS[index];
+  const goTo = (i: number) => setIndex(((i % total) + total) % total);
 
   return (
     <div
-      ref={ref}
-      onMouseEnter={() => setHovered(true)}
-      onMouseLeave={() => setHovered(false)}
-      style={{
-        background: hovered
-          ? 'linear-gradient(135deg, rgba(107,33,168,0.3) 0%, rgba(168,85,247,0.15) 100%)'
-          : 'rgba(255,255,255,0.03)',
-        border: `1px solid ${hovered ? 'rgba(168,85,247,0.5)' : 'rgba(168,85,247,0.15)'}`,
-        borderRadius: 20, padding: 'clamp(24px,3vw,36px)',
-        cursor: 'pointer',
-        transition: 'all 0.4s cubic-bezier(0.34,1.56,0.64,1)',
-        transform: inView
-          ? hovered ? 'translateY(-12px) scale(1.02)' : 'translateY(0) scale(1)'
-          : 'translateY(30px) scale(0.95)',
-        opacity: inView ? 1 : 0,
-        transitionDelay: `${delay}ms`,
-        boxShadow: hovered ? '0 20px 60px rgba(107,33,168,0.3), 0 0 0 1px rgba(168,85,247,0.2)' : 'none',
-        position: 'relative', overflow: 'hidden',
-      }}
+      onMouseEnter={() => setPaused(true)}
+      onMouseLeave={() => setPaused(false)}
+      style={{ position: 'relative', width: '100%', overflow: 'hidden' }}
     >
-      {hovered && (
-        <div style={{
-          position: 'absolute', inset: 0, borderRadius: 20,
-          background: 'radial-gradient(ellipse at 50% 0%, rgba(168,85,247,0.15) 0%, transparent 70%)',
-          pointerEvents: 'none',
-        }} />
-      )}
-      <div style={{
-        fontSize: 'clamp(2rem,4vw,2.5rem)',
-        marginBottom: 16,
-        display: 'inline-block',
-        transition: 'transform 0.4s',
-        transform: hovered ? 'scale(1.2) rotate(-5deg)' : 'scale(1)',
-      }}>{icon}</div>
-      <h3 style={{
-        fontFamily: "'Cinzel', serif",
-        fontSize: 'clamp(1rem,2.2vw,1.25rem)',
-        fontWeight: 600, color: '#E9D5FF',
-        marginBottom: 10, letterSpacing: '0.04em',
-      }}>{title}</h3>
-      <p style={{
-        fontFamily: "'Nunito', sans-serif",
-        fontSize: 'clamp(0.85rem,1.8vw,0.95rem)',
-        color: '#9B8EC4', lineHeight: 1.7,
-      }}>{desc}</p>
-      {hovered && (
-        <div style={{
-          position: 'absolute', bottom: 16, right: 20,
-          fontSize: '0.75rem', color: '#A855F7',
-          fontFamily: "'Nunito', sans-serif", letterSpacing: '0.08em',
-          animation: 'fadeIn 0.3s ease',
-        }}>Boshlash →</div>
-      )}
-      <style>{`@keyframes fadeIn { from { opacity:0; transform:translateX(5px); } to { opacity:1; transform:translateX(0); } }`}</style>
+      <OrbitStars count={90} />
+
+      <div className="story-grid">
+        {/* CHAP TOMON — MATN */}
+        <div className="story-text">
+          <div className="story-index">
+            <SlideText text={`${card.number} / ${String(total).padStart(2, '0')}`} twoTone />
+          </div>
+
+          <h3 className="story-title">
+            <SlideText text={card.title} delayStep={0.014} twoTone />
+          </h3>
+
+          <AnimatePresence mode="wait">
+            <motion.p
+              key={`desc-${card.number}`}
+              className="story-desc"
+              initial={{ opacity: 0, y: 14 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -14 }}
+              transition={{ duration: 0.3, delay: 0.1 }}
+            >
+              {card.desc}
+            </motion.p>
+          </AnimatePresence>
+
+          <div className="story-dots">
+            {GROWTH_CARDS.map((c, i) => (
+              <button
+                key={c.number}
+                aria-label={`${c.number}-slaydga o'tish`}
+                className={`story-dot ${i === index ? 'active' : ''}`}
+                onClick={() => goTo(i)}
+              />
+            ))}
+          </div>
+        </div>
+
+        {/* O'NG TOMON — RASM */}
+        <div className="story-visual">
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={`img-${card.number}`}
+              className="story-photo-wrap"
+              initial={{ opacity: 0, x: 70, rotate: 5 }}
+              animate={{ opacity: 1, x: 0, rotate: -2 }}
+              exit={{ opacity: 0, x: -70, rotate: -6 }}
+              transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
+            >
+              <div
+                className="story-photo-ghost"
+                style={{ backgroundImage: `url(${card.img})` }}
+              />
+              <img
+                src={card.img}
+                alt={card.title.replace('/n', ' ')}
+                className="story-photo-main"
+                onError={(e) => { (e.currentTarget as HTMLImageElement).style.visibility = 'hidden'; }}
+              />
+            </motion.div>
+          </AnimatePresence>
+        </div>
+      </div>
+
+      <style>{`
+        @keyframes orbit-twinkle {
+          0%, 100% { opacity: 0.2; transform: scale(0.8); }
+          50%      { opacity: 1;   transform: scale(1.3); }
+        }
+        .story-grid {
+          position: relative; z-index: 1;
+          display: grid;
+          grid-template-columns: 1fr 1.05fr;
+          align-items: center;
+          gap: clamp(24px, 5vw, 64px);
+          min-height: clamp(420px, 50vw, 560px);
+          padding: clamp(20px, 3vw, 40px) 0;
+        }
+        @media (max-width: 760px) {
+          .story-grid { grid-template-columns: 1fr; text-align: center; }
+        }
+        .story-index {
+          font-family: 'Cinzel Decorative', serif; font-size: 1.05rem; letter-spacing: 0.25em;
+          margin-bottom: 16px; text-transform: uppercase;
+        }
+        .story-title {
+          font-family: 'Cormorant Garamond', serif; font-weight: 700;
+          font-size: clamp(2.6rem, 5.4vw, 4.4rem); line-height: 1.08; margin: 0 0 20px;
+        }
+        .story-desc {
+          font-family: 'Lora', serif; font-size: clamp(1.05rem, 1.9vw, 1.3rem);
+          color: #C4B5FD; line-height: 1.75; max-width: 440px;
+        }
+        @media (max-width: 760px) {
+          .story-desc { max-width: 100%; margin-left: auto; margin-right: auto; }
+        }
+        .story-dots {
+          display: flex; gap: 10px; margin-top: 28px;
+        }
+        @media (max-width: 760px) {
+          .story-dots { justify-content: center; }
+        }
+        .story-dot {
+          width: 28px; height: 3px; border-radius: 2px; border: none; padding: 0;
+          background: rgba(255,255,255,0.22); cursor: pointer;
+          transition: background 0.25s ease, width 0.25s ease;
+        }
+        .story-dot.active { background: #A855F7; width: 44px; }
+
+        .story-visual {
+          position: relative;
+          display: flex; align-items: center; justify-content: center;
+          min-height: clamp(300px, 34vw, 440px);
+        }
+        .story-photo-wrap {
+          position: relative;
+          width: clamp(240px, 30vw, 400px);
+          height: clamp(300px, 36vw, 440px);
+        }
+        .story-photo-ghost {
+          position: absolute; inset: 0;
+          background-size: cover; background-position: center;
+          filter: blur(28px) brightness(0.55) saturate(120%);
+          transform: scale(1.12) rotate(7deg) translate(20px, 16px);
+          opacity: 0.55;
+          border-radius: 26px;
+        }
+        .story-photo-main {
+          position: absolute; inset: 0;
+          width: 100%; height: 100%; object-fit: cover;
+          border-radius: 22px;
+          transform: rotate(-3deg);
+          border: 1px solid rgba(255,255,255,0.16);
+          box-shadow: 0 30px 60px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.15);
+        }
+        @media (prefers-reduced-motion: reduce) {
+          .story-dot { transition: none; }
+        }
+      `}</style>
     </div>
   );
 }
 
 function Features() {
-  const ref = useRef<HTMLDivElement>(null);
-  const inView = useInView(ref);
-  const cards = [
-    { icon: '📖', title: 'Hikoya yaratish', desc: 'Xayolingdagi voqeani yoz va dunyoga taqdim et.' },
-    { icon: '🎨', title: 'Komiks yaratish', desc: 'Rasmlar va ranglar bilan hikoyangni jonlantir.' },
-    { icon: '🎙', title: 'Ovoz berish', desc: 'Qahramonlarga o\'z ovozingni hadya qil.' },
-    { icon: '🎬', title: 'Animatsiya', desc: 'Xayol olamingni animatsiyali videoga aylantir.' },
-  ];
-
   return (
-    <section id="hikoyalar" style={{ padding: 'clamp(60px,8vw,100px) clamp(20px,5vw,80px)', position: 'relative' }}>
-      <div style={{
-        position: 'absolute', top: '30%', right: 0,
-        width: 400, height: 400,
-        background: 'radial-gradient(ellipse, rgba(107,33,168,0.15) 0%, transparent 70%)',
-        pointerEvents: 'none',
-      }} />
-      <div style={{ maxWidth: 1200, margin: '0 auto' }}>
-        <div ref={ref} style={{ textAlign: 'center', marginBottom: 'clamp(40px,6vw,64px)' }}>
-          <p style={{
-            fontFamily: "'Cinzel', serif", fontSize: '0.75rem',
-            letterSpacing: '0.2em', color: '#7C3AED', marginBottom: 12,
-            transition: 'all 0.8s ease', opacity: inView ? 1 : 0,
-            transform: inView ? 'translateY(0)' : 'translateY(10px)',
-          }}>IMKONIYATLAR</p>
+    <section id="hikoyalar" style={{
+      position: 'relative', overflow: 'hidden',
+      padding: 'clamp(60px,8vw,100px) clamp(20px,5vw,80px)',
+    }}>
+      
+      <div style={{ maxWidth: 1200, margin: '0 auto', position: 'relative' }}>
+        {/* SARLAVHA */}
+        <div style={{ textAlign: 'center', margin: '0 auto clamp(24px,4vw,36px)', maxWidth: 640, position: 'relative', zIndex: 5 }}>
+          <p style={{ fontFamily: "'Cinzel Decorative',serif", fontSize: '0.90rem', letterSpacing: '0.2em', color: '#C4B5FD', marginBottom: 12 }}>
+            IMKONIYATLAR
+          </p>
           <h2 style={{
-            fontFamily: "'Cinzel', serif",
-            fontSize: 'clamp(1.8rem,4.5vw,3rem)',
-            fontWeight: 700, color: '#F1E8FF', lineHeight: 1.3,
-            transition: 'all 0.8s ease 0.1s', opacity: inView ? 1 : 0,
-            transform: inView ? 'translateY(0)' : 'translateY(20px)',
-          }}>Bu yerda nimalar<br /><span style={{
-            background: 'linear-gradient(135deg,#F3D89C,#A855F7)',
-            WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text',
-          }}>qila olasiz?</span></h2>
+            fontFamily: "'Cormorant Garamond',serif", fontWeight: 700, color: '#F1E8FF', lineHeight: 1.3,
+            fontSize: 'clamp(2.4rem,5vw,4rem)',
+          }}>
+            Bu yerda nimalar{' '}
+            <span style={{
+              background: 'linear-gradient(135deg,#F3D89C,#A855F7)',
+              WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text',
+            }}>qila olasiz?</span>
+          </h2>
+          <p style={{
+            fontFamily: "'Lora',serif", fontSize: 'clamp(0.9rem,2vw,1.05rem)',
+            color: '#C4B5FD', lineHeight: 1.8, marginTop: 16, maxWidth: 560, marginLeft: 'auto', marginRight: 'auto',
+          }}>
+            Tasavvuringizdagi olamni yarating, boshqalar bilan ulashing va ijodingizni jonlantiring.
+          </p>
         </div>
-        <div style={{
-          display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%,240px), 1fr))',
-          gap: 'clamp(16px,2.5vw,24px)',
-        }}>
-          {cards.map((c, i) => <FeatureCard key={i} {...c} delay={i * 100} />)}
-        </div>
+
+        <OrbitFeatures />
       </div>
     </section>
   );
