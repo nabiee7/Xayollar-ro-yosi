@@ -1,10 +1,11 @@
+const FONT_IMPORT_URL =
+  "https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Cinzel+Decorative:wght@700&family=Cormorant+Garamond:wght@700&family=Lora:wght@400&family=Nunito:wght@400;600;700&display=swap";
 import React, { useState, useEffect, useRef, useMemo} from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 // ─── TYPES ───────────────────────────────────────────────────────────────────
 interface Star { x: number; y: number; size: number; opacity: number; speed: number; }
 interface Particle { x: number; y: number; vx: number; vy: number; size: number; opacity: number; color: string; }
 
-// ─── HOOKS ───────────────────────────────────────────────────────────────────
 function useScrollY() {
   const [scrollY, setScrollY] = useState(0);
   useEffect(() => {
@@ -26,7 +27,6 @@ function useInView(ref: React.RefObject<Element | null>, threshold = 0.15) {
   return inView;
 }
 
-// ─── STAR CANVAS ─────────────────────────────────────────────────────────────
 function StarCanvas({ count = 120 }: { count?: number }) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   useEffect(() => {
@@ -769,127 +769,388 @@ function Features() {
   );
 }
 
-// ─── POPULAR CREATIONS ───────────────────────────────────────────────────────
-function CreationCard({ idx }: { idx: number }) {
-  const [liked, setLiked] = useState(false);
-  const covers = ['🌙', '🏰', '🐉', '🌸', '⚔️', '🦋'];
-  const titles = ['Oy qizi', 'Sehrli qal\'a', 'Ajdaho yo\'li', 'Bahor sirli', 'Botirlar', 'Ko\'k kapalak'];
-  const authors = ['Nilufar', 'Jasur', 'Malika', 'Timur', 'Sarvinoz', 'Bobur'];
-  const views = [1240, 890, 2100, 567, 1876, 743];
-  const likes = [324, 201, 587, 98, 432, 176];
+
+import { Sparkles, Feather, Heart, Eye, ChevronLeft, ChevronRight } from 'lucide-react';
+
+const POPULAR_CREATIONS = [
+  { emoji: '🌙', img: '', title: 'Oy qizi', author: 'Nilufar', likes: 324, views: 1240 },
+  { emoji: '🏰', img: '', title: "Sehrli qal'a", author: 'Jasur', likes: 201, views: 890 },
+  { emoji: '🐉', img: '', title: "Ajdaho yo'li", author: 'Malika', likes: 587, views: 2100 },
+  { emoji: '🌸', img: '', title: 'Bahor siri', author: 'Timur', likes: 98, views: 567 },
+  { emoji: '⚔️', img: '', title: 'Botirlar', author: 'Sarvinoz', likes: 432, views: 1876 },
+  { emoji: '🦋', img: '', title: "Ko'k kapalak", author: 'Bobur', likes: 176, views: 743 },
+];
+
+function useSectionInView(): [React.RefObject<HTMLDivElement | null>, boolean] {
+  const ref = useRef<HTMLDivElement>(null);
+  const [inView, setInView] = useState(false);
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    const io = new IntersectionObserver(([e]) => e.isIntersecting && setInView(true), {
+      threshold: 0.15,
+    });
+    io.observe(el);
+    return () => io.disconnect();
+  }, []);
+  return [ref, inView];
+}
+
+function slotStyle(offset: number) {
+  const abs = Math.abs(offset);
+  const base = {
+    0: { scale: 1, y: -12, opacity: 1, blur: 0, z: 5, x: 0 },
+    1: { scale: 0.8, y: 16, opacity: 0.55, blur: 1.5, z: 3, x: 190 },
+    2: { scale: 0.62, y: 34, opacity: 0.2, blur: 3, z: 1, x: 330 },
+  }[abs] || { scale: 0.5, y: 40, opacity: 0, blur: 4, z: 0, x: 420 };
+  const dir = offset < 0 ? -1 : 1;
+  return { ...base, x: base.x * dir };
+}
+interface PopularItem {
+  emoji: string;
+  img: string;
+  title: string;
+  author: string;
+  likes: number;
+  views: number;
+}
+function LanternCard({ item, offset }: { item: PopularItem; offset: number }) {
+  const active = offset === 0;
+  const s = slotStyle(offset);
+  const [imgFailed, setImgFailed] = useState(false);
+  const hasImg = Boolean(item.img) && !imgFailed;
 
   return (
-    <div style={{
-      background: 'rgba(255,255,255,0.03)',
-      border: '1px solid rgba(168,85,247,0.15)',
-      borderRadius: 16, overflow: 'hidden',
-      transition: 'all 0.3s ease',
-    }}
-      onMouseEnter={e => {
-        e.currentTarget.style.transform = 'translateY(-8px)';
-        e.currentTarget.style.borderColor = 'rgba(168,85,247,0.4)';
-        e.currentTarget.style.boxShadow = '0 20px 40px rgba(107,33,168,0.25)';
-      }}
-      onMouseLeave={e => {
-        e.currentTarget.style.transform = 'translateY(0)';
-        e.currentTarget.style.borderColor = 'rgba(168,85,247,0.15)';
-        e.currentTarget.style.boxShadow = 'none';
+    <div
+      style={{
+        position: 'absolute',
+        left: '50%',
+        top: active ? 0 : 14,
+        transform: `translateX(calc(-50% + ${s.x}px)) translateY(${s.y}px) scale(${s.scale})`,
+        opacity: s.opacity,
+        filter: s.blur ? `blur(${s.blur}px)` : 'none',
+        zIndex: s.z,
+        transition: 'transform 0.65s cubic-bezier(0.22,1,0.36,1), opacity 0.55s ease, filter 0.55s ease',
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        pointerEvents: active ? 'auto' : 'none',
+        width: 200,
       }}
     >
-      {/* Cover */}
-      <div style={{
-        height: 160, display: 'flex', alignItems: 'center', justifyContent: 'center',
-        background: `linear-gradient(135deg, rgba(107,33,168,0.4) 0%, rgba(13,10,26,0.8) 100%)`,
-        fontSize: '4rem', position: 'relative',
-      }}>
-        {covers[idx % 6]}
-        <div style={{
-          position: 'absolute', inset: 0,
-          background: 'linear-gradient(to bottom, transparent 40%, rgba(13,10,26,0.6) 100%)',
-        }} />
+      {/* Main lantern pane */}
+      <div
+        className={active ? 'lantern-lit' : undefined}
+        style={{
+          position: 'relative',
+          width: active ? 200 : 176,
+          height: active ? 250 : 218,
+          borderRadius: '96px 96px 18px 18px',
+          overflow: 'hidden',
+          border: active ? '1.5px solid rgba(243,216,156,0.55)' : '1px solid rgba(168,85,247,0.22)',
+          background:
+            'radial-gradient(ellipse at 50% 28%, rgba(124,58,237,0.4) 0%, rgba(18,11,34,0.95) 72%)',
+          boxShadow: active
+            ? '0 0 60px rgba(243,216,156,0.28), 0 0 40px rgba(168,85,247,0.35), 0 24px 48px rgba(0,0,0,0.55)'
+            : '0 12px 28px rgba(0,0,0,0.45)',
+        }}
+      >
+        {/* faint star texture */}
+        <div
+          style={{
+            position: 'absolute',
+            inset: 0,
+            backgroundImage:
+              'radial-gradient(1.5px 1.5px at 20% 30%, rgba(255,255,255,0.5) 50%, transparent 100%),' +
+              'radial-gradient(1.5px 1.5px at 70% 60%, rgba(255,255,255,0.4) 50%, transparent 100%),' +
+              'radial-gradient(1px 1px at 45% 80%, rgba(255,255,255,0.35) 50%, transparent 100%)',
+            opacity: 0.8,
+          }}
+        />
+        <div
+          style={{
+            width: '100%',
+            height: '100%',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            overflow: 'hidden',
+          }}
+        >
+          {hasImg ? (
+            <img
+              src={item.img}
+              alt={item.title}
+              onError={() => setImgFailed(true)}
+              style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+            />
+          ) : (
+            <span
+              style={{
+                fontSize: active ? '4rem' : '3rem',
+                filter: `drop-shadow(0 0 ${active ? 22 : 10}px rgba(168,85,247,0.45))`,
+              }}
+            >
+              {item.emoji}
+            </span>
+          )}
+        </div>
       </div>
-      {/* Info */}
-      <div style={{ padding: '16px 20px' }}>
-        <h4 style={{
-          fontFamily: "'Cinzel', serif",
-          fontSize: '1rem', fontWeight: 600,
-          color: '#E9D5FF', marginBottom: 6,
-        }}>{titles[idx % 6]}</h4>
-        <p style={{ fontFamily: "'Nunito',sans-serif", fontSize: '0.8rem', color: '#7C6A9E', marginBottom: 12 }}>
-          ✍️ {authors[idx % 6]}
-        </p>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-          <div style={{ display: 'flex', gap: 14 }}>
-            <button onClick={() => setLiked(!liked)} style={{
-              background: 'none', border: 'none', cursor: 'pointer',
-              fontFamily: "'Nunito',sans-serif", fontSize: '0.8rem',
-              color: liked ? '#F472B6' : '#7C6A9E',
-              transition: 'all 0.2s', display: 'flex', alignItems: 'center', gap: 4,
-              transform: liked ? 'scale(1.2)' : 'scale(1)',
-            }}>❤️ {likes[idx % 6] + (liked ? 1 : 0)}</button>
-            <span style={{ fontFamily: "'Nunito',sans-serif", fontSize: '0.8rem', color: '#7C6A9E', display: 'flex', alignItems: 'center', gap: 4 }}>
-              👁 {views[idx % 6]}
+
+      {/* Brass base */}
+      <div
+        style={{
+          width: active ? 116 : 100,
+          height: 8,
+          borderRadius: '0 0 8px 8px',
+          background: 'linear-gradient(180deg, #8A6D3F 0%, #5B4526 100%)',
+          boxShadow: '0 3px 8px rgba(0,0,0,0.5)',
+        }}
+      />
+
+      {/* Text block — hidden on receded slots to avoid clutter */}
+      <div style={{ opacity: active ? 1 : 0.75, transition: 'opacity 0.4s' }}>
+        <h4
+          style={{
+            fontFamily: "'Cinzel',serif",
+            fontWeight: 700,
+            fontSize: active ? '1.12rem' : '0.92rem',
+            color: '#F1E8FF',
+            marginTop: 14,
+            marginBottom: 6,
+            textAlign: 'center',
+            whiteSpace: 'nowrap',
+          }}
+        >
+          {item.title}
+        </h4>
+
+        <div
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            gap: 5,
+            marginBottom: 10,
+          }}
+        >
+          <Feather size={12} color="#B79FE0" strokeWidth={2} />
+          <span style={{ fontFamily: "'Nunito',sans-serif", fontSize: '0.8rem', color: '#B79FE0' }}>
+            {item.author}
+          </span>
+        </div>
+
+        {active && (
+          <div style={{ display: 'flex', gap: 8, justifyContent: 'center' }}>
+            <span
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: 4,
+                background: 'rgba(244,114,182,0.12)',
+                border: '1px solid rgba(244,114,182,0.25)',
+                borderRadius: 99,
+                padding: '3px 9px',
+                fontFamily: "'Nunito',sans-serif",
+                fontSize: '0.75rem',
+                fontWeight: 700,
+                color: '#F472B6',
+              }}
+            >
+              <Heart size={12} fill="#F472B6" strokeWidth={0} />
+              {item.likes}
+            </span>
+            <span
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: 4,
+                background: 'rgba(155,142,196,0.1)',
+                border: '1px solid rgba(155,142,196,0.22)',
+                borderRadius: 99,
+                padding: '3px 9px',
+                fontFamily: "'Nunito',sans-serif",
+                fontSize: '0.75rem',
+                fontWeight: 700,
+                color: '#9B8EC4',
+              }}
+            >
+              <Eye size={12} strokeWidth={2} />
+              {item.views}
             </span>
           </div>
-          <span style={{
-            padding: '3px 10px', borderRadius: 99,
-            background: 'rgba(168,85,247,0.15)',
-            fontFamily: "'Nunito',sans-serif", fontSize: '0.7rem', color: '#A855F7',
-          }}>Hikoya</span>
-        </div>
+        )}
       </div>
     </div>
   );
 }
-
 function PopularSection() {
-  const ref = useRef<HTMLDivElement>(null);
-  const inView = useInView(ref);
+ const [sectionRef, inView] = useSectionInView();
+  const total = POPULAR_CREATIONS.length;
+  const [center, setCenter] = useState(2);
+
+  const prev = () => setCenter((c) => (c - 1 + total) % total);
+  const next = () => setCenter((c) => (c + 1) % total);
+
+  const offsets = [-2, -1, 0, 1, 2];
+
   return (
-    <section id="ijodlar" style={{ padding: 'clamp(60px,8vw,100px) clamp(20px,5vw,80px)', position: 'relative' }}>
-      <div style={{
-        position: 'absolute', top: 0, left: 0,
-        width: 500, height: 300,
-        background: 'radial-gradient(ellipse, rgba(107,33,168,0.12) 0%, transparent 70%)',
-        pointerEvents: 'none',
-      }} />
-      <div style={{ maxWidth: 1200, margin: '0 auto' }}>
-        <div ref={ref} style={{
-          display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between',
-          marginBottom: 'clamp(32px,5vw,48px)', flexWrap: 'wrap', gap: 16,
-          transition: 'all 0.8s ease', opacity: inView ? 1 : 0, transform: inView ? 'translateY(0)' : 'translateY(20px)',
-        }}>
-          <div>
-            <p style={{ fontFamily: "'Cinzel',serif", fontSize: '0.75rem', letterSpacing: '0.2em', color: '#7C3AED', marginBottom: 10 }}>
-              🔥 MASHHUR IJODLAR
-            </p>
-            <h2 style={{
-              fontFamily: "'Cinzel',serif", fontSize: 'clamp(1.8rem,4vw,2.8rem)',
-              fontWeight: 700, color: '#F1E8FF',
-            }}>Ijodkorlar<br /><span style={{ background: 'linear-gradient(135deg,#F3D89C,#A855F7)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text' }}>dunyosi</span></h2>
-          </div>
-          <button style={{
-            padding: '10px 24px', background: 'transparent',
-            border: '1px solid rgba(168,85,247,0.4)', borderRadius: 99, cursor: 'pointer',
-            fontFamily: "'Nunito',sans-serif", fontWeight: 600, fontSize: '0.85rem', color: '#C4B5FD',
-            transition: 'all 0.2s',
+    <section
+      ref={sectionRef}
+      style={{
+        padding: 'clamp(60px,8vw,110px) clamp(20px,5vw,80px)',
+        position: 'relative',
+        overflow: 'hidden',
+        background: 'radial-gradient(ellipse at 50% 0%, #1a1030 0%, #0B0817 60%)',
+        minHeight: '100vh',
+      }}
+    >
+      <style>{`
+        @import url('${FONT_IMPORT_URL}');
+        @keyframes flicker {
+          0%, 100% { filter: brightness(1); }
+          45% { filter: brightness(1.08); }
+          52% { filter: brightness(0.97); }
+        }
+        .lantern-lit { animation: flicker 4.5s ease-in-out infinite; }
+        @media (prefers-reduced-motion: reduce) {
+          .lantern-lit { animation: none; }
+        }
+      `}</style>
+
+      <div style={{ maxWidth: 1300, margin: '0 auto', position: 'relative' }}>
+        {/* Header */}
+        <div
+          style={{
+            textAlign: 'center',
+            marginBottom: 'clamp(36px,5vw,56px)',
+            transition: 'all 0.8s ease',
+            opacity: inView ? 1 : 0,
+            transform: inView ? 'translateY(0)' : 'translateY(20px)',
           }}
-            onMouseEnter={e => { e.currentTarget.style.background = 'rgba(168,85,247,0.1)'; e.currentTarget.style.borderColor = 'rgba(168,85,247,0.7)'; }}
-            onMouseLeave={e => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.borderColor = 'rgba(168,85,247,0.4)'; }}
-          >Barchasini ko'rish →</button>
+        >
+          <p
+            style={{
+              fontFamily: "'Cinzel',serif",
+              fontSize: '0.78rem',
+              letterSpacing: '0.25em',
+              color: '#A855F7',
+              marginBottom: 14,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: 8,
+            }}
+          >
+            <Sparkles size={13} /> MASHHUR IJODLAR <Sparkles size={13} />
+          </p>
+          <h2
+            style={{
+              fontFamily: "'Cinzel Decorative',serif",
+              fontSize: 'clamp(2rem,4.5vw,3.2rem)',
+              fontWeight: 700,
+              color: '#F1E8FF',
+            }}
+          >
+            Ijodkorlar{' '}
+            <span
+              style={{
+                background: 'linear-gradient(135deg,#F3D89C,#A855F7)',
+                WebkitBackgroundClip: 'text',
+                WebkitTextFillColor: 'transparent',
+                backgroundClip: 'text',
+              }}
+            >
+              dunyosi
+            </span>
+          </h2>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 12, margin: '18px 0' }}>
+            <span style={{ width: 60, height: 1, background: 'rgba(168,85,247,0.4)' }} />
+            <Feather size={15} color="#A855F7" />
+            <span style={{ width: 60, height: 1, background: 'rgba(168,85,247,0.4)' }} />
+          </div>
         </div>
-        <div style={{
-          display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fill, minmax(min(100%,200px),1fr))',
-          gap: 'clamp(14px,2vw,20px)',
-        }}>
-          {[0, 1, 2, 3, 4, 5].map(i => <CreationCard key={i} idx={i} />)}
+
+        {/* Carousel */}
+        <div style={{ position: 'relative', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+          <button
+            onClick={prev}
+            aria-label="Oldingi"
+            style={arrowStyle('left')}
+            onMouseEnter={(e) => (e.currentTarget.style.background = 'rgba(168,85,247,0.28)')}
+            onMouseLeave={(e) => (e.currentTarget.style.background = 'rgba(20,14,35,0.7)')}
+          >
+            <ChevronLeft size={20} />
+          </button>
+
+          <div
+            style={{
+              position: 'relative',
+              height: 380,
+              width: '100%',
+              maxWidth: 900,
+            }}
+          >
+            {offsets.map((offset) => {
+              const idx = ((center + offset) % total + total) % total;
+              return <LanternCard key={idx} item={POPULAR_CREATIONS[idx]} offset={offset} />;
+            })}
+          </div>
+
+          <button
+            onClick={next}
+            aria-label="Keyingi"
+            style={arrowStyle('right')}
+            onMouseEnter={(e) => (e.currentTarget.style.background = 'rgba(168,85,247,0.28)')}
+            onMouseLeave={(e) => (e.currentTarget.style.background = 'rgba(20,14,35,0.7)')}
+          >
+            <ChevronRight size={20} />
+          </button>
+        </div>
+
+        {/* Dots */}
+        <div style={{ display: 'flex', justifyContent: 'center', gap: 8, marginTop: 'clamp(28px,4vw,40px)' }}>
+          {POPULAR_CREATIONS.map((_, i) => (
+            <button
+              key={i}
+              onClick={() => setCenter(i)}
+              aria-label={`${i + 1}-ijodga o'tish`}
+              style={{
+                width: i === center ? 26 : 8,
+                height: 8,
+                borderRadius: 99,
+                border: 'none',
+                background: i === center ? 'linear-gradient(90deg,#A855F7,#F3D89C)' : 'rgba(255,255,255,0.18)',
+                cursor: 'pointer',
+                transition: 'all 0.3s ease',
+              }}
+            />
+          ))}
         </div>
       </div>
     </section>
   );
 }
 
+function arrowStyle(side: 'left' | 'right'): React.CSSProperties {
+  return {
+    position: 'absolute',
+    [side]: 'clamp(0px, 2vw, 20px)',
+    zIndex: 10,
+    width: 44,
+    height: 44,
+    borderRadius: '50%',
+    background: 'rgba(20,14,35,0.7)',
+    backdropFilter: 'blur(6px)',
+    border: '1px solid rgba(168,85,247,0.3)',
+    color: '#E9DEFF',
+    cursor: 'pointer',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    transition: 'background 0.2s',
+  };
+}
 // ─── PARENTS SECTION ─────────────────────────────────────────────────────────
 function ParentsSection() {
   const ref = useRef<HTMLDivElement>(null);
