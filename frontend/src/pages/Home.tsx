@@ -1,3 +1,4 @@
+import { useNavigate } from "react-router-dom";
 const FONT_IMPORT_URL =
   "https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Cinzel+Decorative:wght@700&family=Cormorant+Garamond:wght@700&family=Lora:wght@400&family=Nunito:wght@400;600;700&display=swap";
 import React, { useState, useEffect, useRef, useMemo} from 'react';
@@ -205,6 +206,7 @@ function Intro({ onDone }: { onDone: () => void }) {
 // ─── NAV ─────────────────────────────────────────────────────────────────────
 function Nav({ scrollY }: { scrollY: number }) {
   const [open, setOpen] = useState(false);
+  const navigate = useNavigate();
   const scrolled = scrollY > 50;
   const links = ['Hikoyalar', 'Komiks', 'Ijodlar', 'Ota-onalar' ,'Biz xaqimzda'];
 
@@ -242,18 +244,33 @@ function Nav({ scrollY }: { scrollY: number }) {
             onMouseLeave={e => (e.currentTarget.style.color = '#C4B5FD')}
           >{l}</a>
         ))}
-        <button style={{
-          padding: '8px 20px',
-          background: 'linear-gradient(135deg, #7C3AED, #A855F7)',
-          border: 'none', borderRadius: 99, cursor: 'pointer',
-          fontFamily: "'Nunito', sans-serif", fontWeight: 700, fontSize: '0.85rem',
-          color: '#fff', letterSpacing: '0.04em',
-          boxShadow: '0 0 20px rgba(168,85,247,0.4)',
-          transition: 'all 0.2s',
-        }}
-          onMouseEnter={e => { e.currentTarget.style.transform = 'scale(1.05)'; e.currentTarget.style.boxShadow = '0 0 30px rgba(168,85,247,0.6)'; }}
-          onMouseLeave={e => { e.currentTarget.style.transform = 'scale(1)'; e.currentTarget.style.boxShadow = '0 0 20px rgba(168,85,247,0.4)'; }}
-        > Kirish</button>
+        <button
+  style={{
+    padding: '8px 20px',
+    background: 'linear-gradient(135deg, #7C3AED, #A855F7)',
+    border: 'none',
+    borderRadius: 99,
+    cursor: 'pointer',
+    fontFamily: "'Nunito', sans-serif",
+    fontWeight: 700,
+    fontSize: '0.85rem',
+    color: '#fff',
+    letterSpacing: '0.04em',
+    boxShadow: '0 0 20px rgba(168,85,247,0.4)',
+    transition: 'all 0.2s',
+  }}
+  onClick={() => navigate("/login")}
+  onMouseEnter={e => {
+    e.currentTarget.style.transform = 'scale(1.05)';
+    e.currentTarget.style.boxShadow = '0 0 30px rgba(168,85,247,0.6)';
+  }}
+  onMouseLeave={e => {
+    e.currentTarget.style.transform = 'scale(1)';
+    e.currentTarget.style.boxShadow = '0 0 20px rgba(168,85,247,0.4)';
+  }}
+>
+  Kirish
+</button>
       </div>
       {/* Mobile burger */}
       <button
@@ -1494,7 +1511,7 @@ function Footer() {
             fontFamily: "'Nunito',sans-serif", fontSize: '0.85rem',letterSpacing: '0.1em',
             color: '#9B8EC4', lineHeight: 1.7, maxWidth: 260,
           }}>
-            Yangi olam eshigi! <br></br>༼ つ ◕_◕ ༽つ
+            Yangi olam eshigi! 
           </p>
         </div>
 

@@ -1,23 +1,28 @@
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
-import Home from './pages/Home';
-import Login from './pages/Login';
-import Register from './pages/Register';
-import Dashboard from './pages/Dashboard';
-import Profile from './pages/Profile';
-import Settings from './pages/Settings';
-import Stories from './pages/Stories';
-import StoryCreate from './pages/StoryCreate';
-import StoryView from './pages/StoryView';
-import Gallery from './pages/Gallery';
-import Favorites from './pages/Favorites';
-import Characters from './pages/Characters';
-import ComicCreate from './pages/ComicCreate';
-import Drawing from './pages/Drawing';
-import VideoCreate from './pages/VideoCreate';
-import VoiceStudio from './pages/VoiceStudio';
-import Music from './pages/Music';
-import Genres from './pages/Genres';
-import Parents from './pages/Parents';
+import { BrowserRouter, Routes, Route } from "react-router-dom";
+
+import Home from "./pages/Home";
+import Login from "./pages/Login";
+import Register from "./pages/Register";
+import Signup from "./pages/Signup";
+import ForgotPassword from "./pages/Forgotpassword";
+import ChangePasswordPage from "./pages/Changepassword";
+
+import Dashboard from "./pages/Dashboard";
+import Profile from "./pages/Profile";
+import Settings from "./pages/Settings";
+import Stories from "./pages/Stories";
+import StoryCreate from "./pages/StoryCreate";
+import StoryView from "./pages/StoryView";
+import Gallery from "./pages/Gallery";
+import Favorites from "./pages/Favorites";
+import Characters from "./pages/Characters";
+import ComicCreate from "./pages/ComicCreate";
+import Drawing from "./pages/Drawing";
+import VideoCreate from "./pages/VideoCreate";
+import VoiceStudio from "./pages/VoiceStudio";
+import Music from "./pages/Music";
+import Genres from "./pages/Genres";
+import Parents from "./pages/Parents";
 
 export default function App() {
   return (
@@ -27,6 +32,9 @@ export default function App() {
         <Route path="/" element={<Home />} />
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
+        <Route path="/signup" element={<Signup />} />
+        <Route path="/forgotpassword" element={<ForgotPassword />} />
+        <Route path="/changepassword" element={<ChangePasswordPage />} />
 
         {/* Foydalanuvchi */}
         <Route path="/dashboard" element={<Dashboard />} />
