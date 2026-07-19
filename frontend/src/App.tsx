@@ -2,7 +2,6 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 
 import Home from "./pages/Home";
 import Login from "./pages/Login";
-import Register from "./pages/Register";
 import Signup from "./pages/Signup";
 import ForgotPassword from "./pages/Forgotpassword";
 import ChangePasswordPage from "./pages/Changepassword";
@@ -31,7 +30,6 @@ export default function App() {
         {/* Asosiy */}
         <Route path="/" element={<Home />} />
         <Route path="/login" element={<Login />} />
-        <Route path="/register" element={<Register />} />
         <Route path="/signup" element={<Signup />} />
         <Route path="/forgotpassword" element={<ForgotPassword />} />
         <Route path="/changepassword" element={<ChangePasswordPage />} />
@@ -45,7 +43,7 @@ export default function App() {
         {/* Hikoyalar */}
         <Route path="/stories" element={<Stories />} />
         <Route path="/stories/:id" element={<StoryView />} />
-        <Route path="/stories/create" element={<StoryCreate />} />
+        <Route path="/storiecreate" element={<StoryCreate />} />
 
         {/* Ijod */}
         <Route path="/gallery" element={<Gallery />} />

@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
@@ -10,21 +11,13 @@ import {
 const FONT_IMPORT_URL =
   "https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Cinzel+Decorative:wght@700&family=Cormorant+Garamond:wght@700&family=Lora:wght@400&family=Nunito:wght@400;600;700&display=swap";
 
-/* ────────────────────────────────────────────────────────────────────────
-   RASMLAR — bu yerga o'zingizning rasm manzillaringizni (URL yoki import
-   qilingan fayl) qo'ying. Bo'sh qoldirsangiz eski ko'rinish (icon/gradient)
-   avtomatik ishlatiladi, hech narsa buzilmaydi.
-   ──────────────────────────────────────────────────────────────────── */
 const IMAGES = {
   
-  logo: '/logo.png',            // masalan: '/assets/logo.png' — sidebar'dagi doira logo
-  heroCharacter: '/dashboard.png',    // masalan: '/assets/hero-moon-girl.png' — katta oy card'idagi rasm
-  parentsBanner: '/oila.png',    // masalan: '/assets/parents-banner.png' — "Aqlli va axloqli farzand..." card'i
+  logo: '/logo.png',           
+  heroCharacter: '/dashboard.png',  
+  parentsBanner: '/oila.png',   
 };
 
-/* ────────────────────────────────────────────────────────────────────────
-   DATA
-   ──────────────────────────────────────────────────────────────────── */
 interface NavItem { label: string; icon: React.ReactNode; }
 
 const MAIN_NAV: NavItem[] = [
@@ -336,6 +329,7 @@ function Topbar({ onMenuClick, userName }: { onMenuClick: () => void; userName: 
    HERO BANNER
    ──────────────────────────────────────────────────────────────────── */
 function HeroBanner() {
+   const navigate = useNavigate();
   return (
     <section
       style={{
@@ -448,6 +442,7 @@ function HeroBanner() {
           }}
         >
           <button
+           onClick={() => navigate('/storiecreate')}
             style={{
               display: "flex",
               alignItems: "center",
