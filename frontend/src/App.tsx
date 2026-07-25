@@ -18,7 +18,7 @@ import Characters from "./pages/Characters";
 import ComicCreate from "./pages/ComicCreate";
 import Drawing from "./pages/Drawing";
 import VideoCreate from "./pages/VideoCreate";
-import VoiceStudio from "./pages/VoiceStudio";
+import VoiceStudio from "./pages/Voice";
 import Music from "./pages/Music";
 import Genres from "./pages/Genres";
 import Parents from "./pages/Parents";
@@ -48,7 +48,7 @@ export default function App() {
         {/* Ijod */}
         <Route path="/gallery" element={<Gallery />} />
         <Route path="/characters" element={<Characters />} />
-        <Route path="/comics/create" element={<ComicCreate />} />
+        <Route path="/comicscreate" element={<ComicCreate />} />
         <Route path="/drawing" element={<Drawing />} />
         <Route path="/video/create" element={<VideoCreate />} />
         <Route path="/voice" element={<VoiceStudio />} />
