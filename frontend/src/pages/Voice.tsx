@@ -260,28 +260,60 @@ export default function VoiceGenerate() {
           font-family: 'Nunito',sans-serif; font-weight: 700; font-size: 0.68rem; color: #B3A6D6; text-align: center;
         }
 
-        /* CENTER RECORDING PANEL — endi to'liq balandlikka cho'ziladi */
+        /* CENTER RECORDING PANEL — rasm endi butun kartaga orqa fon bo'lib to'liq yoyiladi */
         .record-card {
-          text-align: center;
           position: relative;
           height: 100%;
+          overflow: hidden;
+          padding: 0;
+        }
+
+        /* Rasm — kartaning orqasida, to'liq kenglik/balandlikni qoplaydi */
+        .mic-illustration {
+          position: absolute;
+          inset: 0;
+          width: 100%;
+          height: 100%;
+          margin: 0;
+          max-width: none;
+          z-index: 0;
+        }
+        .mic-illustration img {
+          width: 100%;
+          height: 100%;
+          object-fit: cover;
+          display: block;
+        }
+
+        /* Rasm ustida o'qilishi uchun qorong'ilashtiruvchi qatlam */
+        .record-card::after {
+          content: '';
+          position: absolute;
+          inset: 0;
+          background: linear-gradient(180deg, rgba(13,10,26,0.35) 0%, rgba(13,10,26,0.55) 55%, rgba(13,10,26,0.85) 100%);
+          z-index: 1;
+        }
+
+        /* Haqiqiy kontent — rasm va overlay ustida joylashadi */
+        .record-card-content {
+          position: relative;
+          z-index: 2;
+          height: 100%;
+          padding: clamp(16px,2vw,22px);
           display: flex;
           flex-direction: column;
-          justify-content: center;
+          justify-content: flex-end;
           gap: 16px;
+          text-align: center;
         }
+
         .tips-btn {
           position: absolute; top: clamp(16px,2vw,22px); right: clamp(16px,2vw,22px);
           display: flex; align-items: center; gap: 6px; padding: 8px 14px; border-radius: 99px;
-          background: rgba(255,255,255,0.03); border: 1px solid rgba(168,85,247,0.2); cursor: pointer;
+          background: rgba(0,0,0,0.35); border: 1px solid rgba(168,85,247,0.35); cursor: pointer;
           font-family: 'Nunito',sans-serif; font-weight: 700; font-size: 0.78rem; color: #E9DEFF;
+          z-index: 3; backdrop-filter: blur(4px);
         }
-
-        .mic-illustration {
-          width: 100%; max-width: 320px; margin: 0 auto;
-          display: flex; align-items: center; justify-content: center;
-        }
-        .mic-illustration img { width: 100%; height: auto; object-fit: contain; }
 
         .waveform { display: flex; align-items: center; justify-content: center; gap: 3px; height: 40px; }
         .waveform span { width: 3px; border-radius: 2px; background: linear-gradient(180deg,#C4B5FD,#A855F7); opacity: 0.6; }
@@ -385,7 +417,7 @@ export default function VoiceGenerate() {
         /* RESPONSIVE */
         @media (max-width: 1180px) {
           .voice-body { grid-template-columns: 1fr; }
-          .record-card { height: auto; }
+          .record-card { height: auto; min-height: 480px; }
           .apply-grid { grid-template-columns: repeat(2, 1fr); }
         }
         @media (max-width: 640px) {
@@ -449,41 +481,43 @@ export default function VoiceGenerate() {
             </div>
           </div>
 
-          {/* CENTER — record panel, endi to'liq balandlikka cho'ziladi */}
+          {/* CENTER — record panel: rasm to'liq orqa fon, kontent uning ustida */}
           <div className="card record-card">
+            <div className="mic-illustration">
+              <img src="/voice.png" alt="Mikrofon illyustratsiyasi" />
+            </div>
+
             <button className="tips-btn"><Lightbulb size={14} /> Maslahatlar</button>
 
-            <div className="mic-illustration">
-              <img src={IMAGES.micIllustration} alt="Mikrofon illyustratsiyasi" />
-            </div>
+            <div className="record-card-content">
+              <div className="waveform">
+                {Array.from({ length: 40 }).map((_, i) => (
+                  <span key={i} style={{ height: `${8 + Math.abs(Math.sin(i / 3)) * 24}px` }} />
+                ))}
+              </div>
 
-            <div className="waveform">
-              {Array.from({ length: 40 }).map((_, i) => (
-                <span key={i} style={{ height: `${8 + Math.abs(Math.sin(i / 3)) * 24}px` }} />
-              ))}
-            </div>
+              <div className="time-display">00:00 / 00:00</div>
 
-            <div className="time-display">00:00 / 00:00</div>
+              <div className="record-controls">
+                <button className="record-side-btn" aria-label="Ijro etish"><Play size={18} /></button>
+                <button
+                  className={`record-main-btn ${isRecording ? 'recording' : ''}`}
+                  onClick={() => setIsRecording(r => !r)}
+                  aria-label={isRecording ? "To'xtatish" : 'Yozishni boshlash'}
+                >
+                  <Mic size={26} />
+                </button>
+                <button className="record-side-btn" aria-label="To'xtatish"><Square size={16} /></button>
+              </div>
 
-            <div className="record-controls">
-              <button className="record-side-btn" aria-label="Ijro etish"><Play size={18} /></button>
-              <button
-                className={`record-main-btn ${isRecording ? 'recording' : ''}`}
-                onClick={() => setIsRecording(r => !r)}
-                aria-label={isRecording ? "To'xtatish" : 'Yozishni boshlash'}
-              >
-                <Mic size={26} />
-              </button>
-              <button className="record-side-btn" aria-label="To'xtatish"><Square size={16} /></button>
-            </div>
+              <div className="record-hint">
+                Avval yozib oling yoki matnni avtomatik o'qitish uchun "O'qitish" tugmasini bosing.
+              </div>
 
-            <div className="record-hint">
-              Avval yozib oling yoki matnni avtomatik o'qitish uchun "O'qitish" tugmasini bosing.
-            </div>
-
-            <div className="record-actions">
-              <button className="btn-outline-purple"><Sparkles size={15} /> Matnni o'qitish</button>
-              <button className="btn-fill-purple"><Mic size={15} /> Ovoz yozish</button>
+              <div className="record-actions">
+                <button className="btn-outline-purple"><Sparkles size={15} /> Matnni o'qitish</button>
+                <button className="btn-fill-purple"><Mic size={15} /> Ovoz yozish</button>
+              </div>
             </div>
           </div>
 
