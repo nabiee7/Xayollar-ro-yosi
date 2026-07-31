@@ -20,7 +20,6 @@ import Drawing from "./pages/Drawing";
 import VideoCreate from "./pages/VideoCreate";
 import VoiceStudio from "./pages/Voice";
 import Music from "./pages/Music";
-import Genres from "./pages/Genres";
 import Parents from "./pages/Parents";
 
 export default function App() {
@@ -50,12 +49,11 @@ export default function App() {
         <Route path="/characters" element={<Characters />} />
         <Route path="/comicscreate" element={<ComicCreate />} />
         <Route path="/drawing" element={<Drawing />} />
-        <Route path="/video/create" element={<VideoCreate />} />
+        <Route path="/videocreate" element={<VideoCreate />} />
         <Route path="/voice" element={<VoiceStudio />} />
         <Route path="/music" element={<Music />} />
 
-        {/* Boshqalar */}
-        <Route path="/genres" element={<Genres />} />
+    
         <Route path="/parents" element={<Parents />} />
       </Routes>
     </BrowserRouter>
