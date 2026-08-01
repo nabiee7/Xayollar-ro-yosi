@@ -93,20 +93,34 @@ function AvatarImg({ src, name }: { src: string; name: string }) {
 function HeroIllustration({ src }: { src: string }) {
   const [failed, setFailed] = useState(false);
   if (failed) {
-    // Decorative fallback drawn in CSS/SVG so the layout still reads as intended
+    // Decorative fallback drawn in CSS/SVG so the layout still reads as intended,
+    // sized to fully cover the hero card like a real photo would.
     return (
-      <svg className="hero-fallback-art" viewBox="0 0 300 220" xmlns="http://www.w3.org/2000/svg">
-        <circle cx="240" cy="46" r="26" fill="rgba(243,216,156,0.85)" />
-        <ellipse cx="70" cy="150" rx="90" ry="26" fill="rgba(233,222,255,0.14)" />
-        <ellipse cx="180" cy="175" rx="110" ry="30" fill="rgba(233,222,255,0.10)" />
-        <g fill="rgba(200,180,255,0.5)">
-          <rect x="110" y="90" width="14" height="60" />
-          <rect x="150" y="70" width="16" height="80" />
-          <rect x="190" y="95" width="14" height="55" />
-          <polygon points="117,90 117,70 131,84" />
-          <polygon points="158,70 158,50 174,64" />
-          <polygon points="197,95 197,78 211,89" />
+      <svg
+        className="hero-art hero-fallback-art"
+        viewBox="0 0 600 400"
+        preserveAspectRatio="xMidYMid slice"
+        xmlns="http://www.w3.org/2000/svg"
+      >
+        <defs>
+          <radialGradient id="heroSky" cx="70%" cy="20%" r="80%">
+            <stop offset="0%" stopColor="#3b2a68" />
+            <stop offset="55%" stopColor="#241a44" />
+            <stop offset="100%" stopColor="#140e28" />
+          </radialGradient>
+        </defs>
+        <rect width="600" height="400" fill="url(#heroSky)" />
+        <circle cx="480" cy="80" r="46" fill="rgba(243,216,156,0.9)" />
+        <circle cx="466" cy="66" r="46" fill="#241a44" opacity="0.9" />
+        <g fill="rgba(200,180,255,0.55)">
+          <rect x="220" y="200" width="26" height="120" />
+          <rect x="290" y="150" width="30" height="170" />
+          <rect x="360" y="210" width="26" height="110" />
+          <polygon points="233,200 233,160 265,186" />
+          <polygon points="305,150 305,105 341,132" />
+          <polygon points="373,210 373,178 403,199" />
         </g>
+        <ellipse cx="300" cy="330" rx="260" ry="50" fill="rgba(20,14,35,0.6)" />
       </svg>
     );
   }
@@ -170,53 +184,57 @@ function StoryMenu({ storyId }: { storyId: string }) {
   );
 }
 
-// ─── AMBIENT BACKGROUND — tungi osmon: bulutlar, yulduz turkumlari, uchqunlar ──
-// Oldingi (chizish) sahifasidagi aylanuvchi sehr-doiralari va rangli chang
-// zarralaridan farqli o'laroq: bu yerda sekin suzuvchi tungi bulutlar, sokin
-// milt-milt yulduz turkumi chiziqlari va pastdan yuqoriga ko'tarilib
-// so'nadigan oltin uchqunlar bor. Faqat vizual dekor, pointer-events yo'q.
+// ─── AMBIENT BACKGROUND ──────────────────────────────────────────────────────
+// Big, clearly-moving magic "orbs" drifting across the page + shooting stars
+// streaking through the sky + a fine layer of twinkling stardust.
 function ProfileAmbientBackground() {
-  const clouds = [
-    { top: "6%", scale: 1.15, duration: 46, delay: 0, opacity: 0.16 },
-    { top: "22%", scale: 0.8, duration: 60, delay: -14, opacity: 0.12 },
-    { top: "48%", scale: 1.4, duration: 70, delay: -30, opacity: 0.1 },
-    { top: "68%", scale: 0.95, duration: 52, delay: -8, opacity: 0.13 },
+  const orbs = [
+    { top: "-8%", left: "62%", size: 420, color: "rgba(124,58,237,0.55)", duration: 26, delay: 0 },
+    { top: "38%", left: "-10%", size: 380, color: "rgba(236,72,153,0.4)", duration: 32, delay: -6 },
+    { top: "62%", left: "70%", size: 460, color: "rgba(56,189,248,0.3)", duration: 38, delay: -14 },
+    { top: "10%", left: "20%", size: 260, color: "rgba(243,216,156,0.35)", duration: 22, delay: -3 },
   ];
-  const stars = Array.from({ length: 34 }, (_, i) => i);
-  const sparkles = Array.from({ length: 16 }, (_, i) => i);
+
+  const shootingStars = [
+    { top: "8%", duration: 7, delay: 1 },
+    { top: "22%", duration: 9, delay: 5 },
+    { top: "40%", duration: 6.5, delay: 9 },
+    { top: "58%", duration: 8, delay: 3 },
+    { top: "75%", duration: 10, delay: 7 },
+  ];
+
+  const stars = Array.from({ length: 46 }, (_, i) => i);
+  const sparkles = Array.from({ length: 18 }, (_, i) => i);
 
   return (
     <div className="profile-ambient" aria-hidden="true">
-      <div className="profile-moon" />
-
-      {clouds.map((c, i) => (
+      {orbs.map((o, i) => (
         <div
-          key={`cloud-${i}`}
-          className="profile-cloud"
+          key={`orb-${i}`}
+          className="profile-orb"
           style={{
-            top: c.top,
-            opacity: c.opacity,
-            transform: `scale(${c.scale})`,
-            animationDuration: `${c.duration}s`,
-            animationDelay: `${c.delay}s`,
+            top: o.top,
+            left: o.left,
+            width: o.size,
+            height: o.size,
+            background: `radial-gradient(circle, ${o.color} 0%, transparent 70%)`,
+            animationDuration: `${o.duration}s`,
+            animationDelay: `${o.delay}s`,
           }}
         />
       ))}
 
-      <svg className="profile-constellation" viewBox="0 0 800 600" xmlns="http://www.w3.org/2000/svg">
-        <polyline
-          points="80,120 180,80 260,150 360,90 440,160 540,100 620,170"
-          fill="none" stroke="rgba(243,216,156,0.28)" strokeWidth="1"
+      {shootingStars.map((s, i) => (
+        <div
+          key={`shoot-${i}`}
+          className="profile-shooting-star"
+          style={{
+            top: s.top,
+            animationDuration: `${s.duration}s`,
+            animationDelay: `${s.delay}s`,
+          }}
         />
-        <polyline
-          points="120,420 210,470 300,410 380,460 470,400"
-          fill="none" stroke="rgba(168,85,247,0.24)" strokeWidth="1"
-        />
-        {[[80,120],[180,80],[260,150],[360,90],[440,160],[540,100],[620,170],
-          [120,420],[210,470],[300,410],[380,460],[470,400]].map(([cx, cy], i) => (
-          <circle key={i} cx={cx} cy={cy} r={2.4} fill="rgba(243,216,156,0.65)" />
-        ))}
-      </svg>
+      ))}
 
       {stars.map((i) => (
         <span
@@ -288,77 +306,75 @@ export default function ProfilePage() {
         /* ── AMBIENT BACKGROUND ── */
         .profile-ambient { position: fixed; inset: 0; overflow: hidden; pointer-events: none; z-index: 0; }
 
-        .profile-moon {
-          position: absolute; top: -6%; right: 8%;
-          width: 220px; height: 220px; border-radius: 50%;
-          background: radial-gradient(circle at 38% 35%, rgba(255,250,225,0.95), rgba(243,216,156,0.35) 55%, transparent 75%);
-          filter: blur(2px);
-          opacity: 0.8;
-          animation: profile-moon-glow 8s ease-in-out infinite;
+        .profile-orb {
+          position: absolute;
+          border-radius: 50%;
+          filter: blur(10px);
+          animation-name: profile-orb-drift;
+          animation-timing-function: ease-in-out;
+          animation-iteration-count: infinite;
+          will-change: transform;
         }
-        @keyframes profile-moon-glow {
-          0%, 100% { opacity: 0.7; }
-          50% { opacity: 0.95; }
+        @keyframes profile-orb-drift {
+          0%   { transform: translate(0, 0) scale(1); }
+          25%  { transform: translate(-6vw, 5vh) scale(1.12); }
+          50%  { transform: translate(3vw, -7vh) scale(0.92); }
+          75%  { transform: translate(6vw, 4vh) scale(1.06); }
+          100% { transform: translate(0, 0) scale(1); }
         }
 
-        .profile-cloud {
-          position: absolute; left: -30%;
-          width: 46vw; height: 90px; max-width: 520px;
-          background: radial-gradient(ellipse at 30% 50%, rgba(233,222,255,0.9), transparent 70%),
-                      radial-gradient(ellipse at 60% 40%, rgba(233,222,255,0.7), transparent 65%),
-                      radial-gradient(ellipse at 80% 55%, rgba(233,222,255,0.6), transparent 70%);
-          filter: blur(6px);
-          animation-name: profile-cloud-drift;
+        .profile-shooting-star {
+          position: absolute;
+          left: -12%;
+          width: 160px;
+          height: 2px;
+          border-radius: 2px;
+          background: linear-gradient(90deg, rgba(243,216,156,0) 0%, rgba(255,250,235,0.95) 60%, rgba(255,250,235,0) 100%);
+          transform: rotate(18deg);
+          opacity: 0;
+          animation-name: profile-shoot;
           animation-timing-function: linear;
           animation-iteration-count: infinite;
         }
-        @keyframes profile-cloud-drift {
-          from { transform: translateX(0) scale(var(--s, 1)); }
-          to { transform: translateX(150vw) scale(var(--s, 1)); }
-        }
-
-        .profile-constellation {
-          position: absolute; inset: 0; width: 100%; height: 100%;
-          opacity: 0.5;
-          animation: profile-const-fade 12s ease-in-out infinite;
-        }
-        @keyframes profile-const-fade {
-          0%, 100% { opacity: 0.32; }
-          50% { opacity: 0.6; }
+        @keyframes profile-shoot {
+          0%   { transform: translate(0, 0) rotate(18deg); opacity: 0; }
+          4%   { opacity: 1; }
+          16%  { opacity: 0; }
+          100% { transform: translate(140vw, 55vh) rotate(18deg); opacity: 0; }
         }
 
         .profile-star {
-          position: absolute; width: 2px; height: 2px; border-radius: 50%;
+          position: absolute; width: 2.5px; height: 2.5px; border-radius: 50%;
           background: #F1E8FF;
-          box-shadow: 0 0 5px 1px rgba(241,232,255,0.8);
+          box-shadow: 0 0 6px 1.5px rgba(241,232,255,0.85);
           opacity: 0;
           animation-name: profile-star-twinkle;
           animation-timing-function: ease-in-out;
           animation-iteration-count: infinite;
         }
         @keyframes profile-star-twinkle {
-          0%, 100% { opacity: 0; }
-          50% { opacity: 0.9; }
+          0%, 100% { opacity: 0; transform: scale(0.8); }
+          50% { opacity: 1; transform: scale(1.2); }
         }
 
         .profile-sparkle {
           position: absolute; bottom: -4%;
-          width: 4px; height: 4px; border-radius: 50%;
+          width: 5px; height: 5px; border-radius: 50%;
           background: #F3D89C;
-          box-shadow: 0 0 8px 2px rgba(243,216,156,0.7);
+          box-shadow: 0 0 10px 3px rgba(243,216,156,0.75);
           opacity: 0;
           animation-name: profile-sparkle-rise;
           animation-timing-function: ease-out;
           animation-iteration-count: infinite;
         }
         @keyframes profile-sparkle-rise {
-          0% { transform: translateY(0); opacity: 0; }
-          12% { opacity: 0.9; }
-          100% { transform: translateY(-100vh); opacity: 0; }
+          0% { transform: translateY(0) translateX(0); opacity: 0; }
+          10% { opacity: 0.95; }
+          100% { transform: translateY(-100vh) translateX(30px); opacity: 0; }
         }
 
         @media (prefers-reduced-motion: reduce) {
-          .profile-cloud, .profile-constellation, .profile-star, .profile-sparkle, .profile-moon {
+          .profile-orb, .profile-shooting-star, .profile-star, .profile-sparkle {
             animation: none !important;
           }
         }
@@ -395,25 +411,28 @@ export default function ProfilePage() {
           display: flex; flex-direction: column; gap: 22px;
         }
 
-        /* hero card */
+        /* hero card — the illustration is now the full background of the card,
+           with the profile content laid on top of a readability gradient */
         .hero-card {
           position: relative; overflow: hidden;
           border-radius: 26px; border: 1px solid rgba(168,85,247,0.22);
-          background: linear-gradient(135deg, rgba(88,45,150,0.35), rgba(30,20,55,0.55));
-          backdrop-filter: blur(8px);
+          min-height: 280px;
+          display: flex; align-items: flex-end;
           padding: clamp(20px,3vw,32px);
-          display: flex; align-items: center; gap: 24px; min-height: 220px;
         }
-        .hero-content { position: relative; z-index: 2; flex: 1; min-width: 0; }
         .hero-art-wrap {
-          position: absolute; inset: 0; z-index: 1; display: flex; justify-content: flex-end; align-items: flex-end;
-          opacity: 0.9; pointer-events: none;
+          position: absolute; inset: 0; z-index: 0;
         }
-        .hero-art, .hero-fallback-art { width: min(62%, 420px); height: auto; object-fit: contain; }
+        .hero-art, .hero-fallback-art {
+          width: 100%; height: 100%;
+          object-fit: cover; object-position: center;
+          display: block;
+        }
         .hero-card::after {
           content: ""; position: absolute; inset: 0; z-index: 1;
-          background: linear-gradient(90deg, rgba(20,14,35,0.85) 0%, rgba(20,14,35,0.55) 38%, transparent 70%);
+          background: linear-gradient(180deg, rgba(10,7,20,0.1) 0%, rgba(12,8,22,0.45) 55%, rgba(9,6,17,0.92) 100%);
         }
+        .hero-content { position: relative; z-index: 2; width: 100%; }
 
         .avatar-row { display: flex; align-items: center; gap: 16px; margin-bottom: 14px; }
         .avatar-wrap { position: relative; width: 78px; height: 78px; flex-shrink: 0; }
@@ -435,16 +454,18 @@ export default function ProfilePage() {
         .profile-name {
           font-family: 'Cinzel Decorative', serif; font-size: clamp(1.3rem,2.6vw,1.7rem); font-weight: 700;
           display: flex; align-items: center; gap: 8px; color: #F9F5FF;
+          text-shadow: 0 2px 12px rgba(0,0,0,0.5);
         }
         .profile-handle { color: #C4B5FD; font-size: 0.9rem; font-weight: 600; margin-top: 2px; }
-        .profile-bio { color: #D8CCFA; font-size: 0.92rem; margin-top: 10px; max-width: 420px; line-height: 1.5; }
+        .profile-bio { color: #E9DEFF; font-size: 0.92rem; margin-top: 10px; max-width: 460px; line-height: 1.5; text-shadow: 0 1px 8px rgba(0,0,0,0.45); }
         .edit-profile-btn {
           margin-top: 16px; display: inline-flex; align-items: center; gap: 8px;
           padding: 9px 18px; border-radius: 99px; cursor: pointer;
-          border: 1px solid rgba(233,222,255,0.4); background: rgba(255,255,255,0.06); color: #F1E8FF;
+          border: 1px solid rgba(233,222,255,0.4); background: rgba(255,255,255,0.1); color: #F1E8FF;
+          backdrop-filter: blur(4px);
           font-family: 'Nunito', sans-serif; font-weight: 700; font-size: 0.85rem; transition: background 0.2s;
         }
-        .edit-profile-btn:hover { background: rgba(255,255,255,0.14); }
+        .edit-profile-btn:hover { background: rgba(255,255,255,0.2); }
 
         /* stats */
         .stats-bar {
@@ -579,9 +600,7 @@ export default function ProfilePage() {
           .story-grid { grid-template-columns: repeat(2, 1fr); }
         }
         @media (max-width: 760px) {
-          .hero-card { flex-direction: column; align-items: flex-start; min-height: unset; }
-          .hero-art-wrap { opacity: 0.4; }
-          .hero-card::after { background: linear-gradient(180deg, rgba(20,14,35,0.55) 0%, rgba(20,14,35,0.9) 75%); }
+          .hero-card { min-height: 300px; align-items: flex-end; }
           .stats-bar { grid-template-columns: repeat(2, 1fr); }
           .stat-item:nth-child(2) { border-right: none; }
           .stat-item:nth-child(1), .stat-item:nth-child(2) { border-bottom: 1px solid rgba(168,85,247,0.14); }

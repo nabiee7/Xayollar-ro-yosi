@@ -51,9 +51,7 @@ export default function App() {
         <Route path="/drawing" element={<Drawing />} />
         <Route path="/videocreate" element={<VideoCreate />} />
         <Route path="/voice" element={<VoiceStudio />} />
-        <Route path="/music" element={<Music />} />
-
-    
+        <Route path="/music" element={<Music />} />   
         <Route path="/parents" element={<Parents />} />
       </Routes>
     </BrowserRouter>

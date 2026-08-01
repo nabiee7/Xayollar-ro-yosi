@@ -1,6 +1,5 @@
-
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import {
   Home, BookOpen, PenLine, LayoutGrid, User, Images, Mic, Music2,
   Sparkles, Video, Heart, MessageSquare, Bell, Search, Crown, Settings,
@@ -18,49 +17,54 @@ const IMAGES = {
   parentsBanner: '/oila.png',   
 };
 
-interface NavItem { label: string; icon: React.ReactNode; }
+// `path` is the route this item navigates to (taken from App.tsx).
+// Leave it out for items that don't have a page yet — they show a
+// "coming soon" notice instead of navigating.
+interface NavItem { label: string; icon: React.ReactNode; path?: string; }
 
 const MAIN_NAV: NavItem[] = [
-  { label: 'Bosh sahifa', icon: <Home size={18} /> },
-  { label: 'Mening hikoyalarim', icon: <BookOpen size={18} /> },
-  { label: 'Yangi hikoya yaratish', icon: <PenLine size={18} /> },
-  { label: 'Komiks yaratish', icon: <LayoutGrid size={18} /> },
-  { label: 'Personajlar', icon: <User size={18} /> },
-  { label: 'Rasmlar galereyasi', icon: <Images size={18} /> },
-  { label: 'Ovozlar', icon: <Mic size={18} /> },
-  { label: 'Musiqa', icon: <Music2 size={18} /> },
-  { label: 'Jonlantirish', icon: <Sparkles size={18} /> },
-  { label: 'Videolar', icon: <Video size={18} /> },
-  { label: 'Sevimlilar', icon: <Heart size={18} /> },
+  { label: 'Bosh sahifa', icon: <Home size={18} />, path: '/dashboard' },
+  { label: 'Mening hikoyalarim', icon: <BookOpen size={18} />, path: '/stories' },
+  { label: 'Yangi hikoya yaratish', icon: <PenLine size={18} />, path: '/storiecreate' },
+  { label: 'Komiks yaratish', icon: <LayoutGrid size={18} />, path: '/comicscreate' },
+  { label: 'Personajlar', icon: <User size={18} />, path: '/characters' },
+  { label: 'Rasmlar galereyasi', icon: <Images size={18} />, path: '/gallery' },
+  { label: 'Ovozlar', icon: <Mic size={18} />, path: '/voice' },
+  { label: 'Musiqa', icon: <Music2 size={18} />, path: '/music' },
+  { label: 'Jonlantirish', icon: <Sparkles size={18} />, path: '/drawing' },
+  { label: 'Videolar', icon: <Video size={18} />, path: '/videocreate' },
+  { label: 'Sevimlilar', icon: <Heart size={18} />, path: '/favorites' },
   { label: 'Fikrlar va sharhlar', icon: <MessageSquare size={18} /> },
   { label: 'Bildirishnomalar', icon: <Bell size={18} /> },
 ];
 
 const CATEGORY_NAV: NavItem[] = [
-  { label: 'Janrlar', icon: <Compass size={18} /> },
-  { label: 'Trenddagi hikoyalar', icon: <TrendingUp size={18} /> },
-  { label: "Yangi qo'shilganlar", icon: <Clock3 size={18} /> },
+  { label: 'Janrlar', icon: <Compass size={18} />, path: '/stories' },
+  { label: 'Trenddagi hikoyalar', icon: <TrendingUp size={18} />, path: '/stories' },
+  { label: "Yangi qo'shilganlar", icon: <Clock3 size={18} />, path: '/stories' },
 ];
 
 const PARENTS_NAV: NavItem[] = [
-  { label: 'Farzandim uchun yaratish', icon: <Baby size={18} /> },
-  { label: 'Tarbiyaviy animelar', icon: <Film size={18} /> },
-  { label: 'Ota-onalar uchun maslahatlar', icon: <MessagesSquare size={18} /> },
-  { label: 'Ilmiy va tarbiyaviy kontent', icon: <GraduationCap size={18} /> },
+  { label: 'Farzandim uchun yaratish', icon: <Baby size={18} />, path: '/parents' },
+  { label: 'Tarbiyaviy animelar', icon: <Film size={18} />, path: '/parents' },
+  { label: 'Ota-onalar uchun maslahatlar', icon: <MessagesSquare size={18} />, path: '/parents' },
+  { label: 'Ilmiy va tarbiyaviy kontent', icon: <GraduationCap size={18} />, path: '/parents' },
 ];
 
-interface QuickAction { title: string; sub: string; icon: React.ReactNode; }
+const SETTINGS_ITEM: NavItem = { label: 'Sozlamalar', icon: <Settings size={18} />, path: '/settings' };
+
+interface QuickAction { title: string; sub: string; icon: React.ReactNode; path: string; }
 const QUICK_ACTIONS: QuickAction[] = [
-  { title: 'Yangi hikoya', sub: 'Yaratish', icon: <BookOpen size={20} /> },
-  { title: 'Komiks', sub: 'Yaratish', icon: <LayoutGrid size={20} /> },
-  { title: 'Personajlar', sub: 'Yaratish', icon: <User size={20} /> },
-  { title: 'Rasm chizish', sub: 'Canvas', icon: <PenLine size={20} /> },
-  { title: 'Ovoz yozish', sub: 'Studio', icon: <Mic size={20} /> },
-  { title: "Musiqa qo'shish", sub: 'Kutubxona', icon: <Music2 size={20} /> },
-  { title: 'Jonlantirish', sub: 'Animate', icon: <Sparkles size={20} /> },
-  { title: 'Video yaratish', sub: 'Render', icon: <Video size={20} /> },
-  { title: 'Galereya', sub: 'Mening rasmlarim', icon: <Images size={20} /> },
-  { title: 'Sevimlilar', sub: 'Saqlanganlar', icon: <Heart size={20} /> },
+  { title: 'Yangi hikoya', sub: 'Yaratish', icon: <BookOpen size={20} />, path: '/storiecreate' },
+  { title: 'Komiks', sub: 'Yaratish', icon: <LayoutGrid size={20} />, path: '/comicscreate' },
+  { title: 'Personajlar', sub: 'Yaratish', icon: <User size={20} />, path: '/characters' },
+  { title: 'Rasm chizish', sub: 'Canvas', icon: <PenLine size={20} />, path: '/drawing' },
+  { title: 'Ovoz yozish', sub: 'Studio', icon: <Mic size={20} />, path: '/voice' },
+  { title: "Musiqa qo'shish", sub: 'Kutubxona', icon: <Music2 size={20} />, path: '/music' },
+  { title: 'Jonlantirish', sub: 'Animate', icon: <Sparkles size={20} />, path: '/drawing' },
+  { title: 'Video yaratish', sub: 'Render', icon: <Video size={20} />, path: '/videocreate' },
+  { title: 'Galereya', sub: 'Mening rasmlarim', icon: <Images size={20} />, path: '/gallery' },
+  { title: 'Sevimlilar', sub: 'Saqlanganlar', icon: <Heart size={20} />, path: '/favorites' },
 ];
 
 interface StoryCard { title: string; genre: string; img: string; comments: number; views: number; likes: number; draft?: boolean; }
@@ -162,13 +166,30 @@ function Sidebar({ open, onClose, active, setActive }: {
   open: boolean; onClose: () => void; active: string; setActive: (s: string) => void;
 }) {
   const navigate = useNavigate();
+  const location = useLocation();
+  const [notice, setNotice] = useState<string | null>(null);
+
+  const showNotice = (label: string) => {
+    setNotice(`${label} — tez orada`);
+    window.setTimeout(() => setNotice(null), 2000);
+  };
 
   const renderItem = (item: NavItem) => {
-    const isActive = active === item.label;
+    // Items with a route are highlighted based on the actual current URL,
+    // so the highlight stays correct even after a refresh or direct link.
+    const isActive = item.path ? location.pathname === item.path : active === item.label;
     return (
       <button
         key={item.label}
-        onClick={() => { setActive(item.label); onClose(); }}
+        onClick={() => {
+          setActive(item.label);
+          if (item.path) {
+            navigate(item.path);
+          } else {
+            showNotice(item.label);
+          }
+          onClose();
+        }}
         style={{
           display: 'flex', alignItems: 'center', gap: 12, width: '100%',
           padding: '9px 14px', borderRadius: 10, border: 'none', cursor: 'pointer',
@@ -193,7 +214,7 @@ function Sidebar({ open, onClose, active, setActive }: {
       )}
       <aside className={`app-sidebar ${open ? 'sidebar-open' : ''}`}>
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '4px 4px 20px' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 10, cursor: 'pointer' }} onClick={() => navigate('/')}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 10, cursor: 'pointer' }} onClick={() => navigate('/dashboard')}>
             <div style={{
               width: 54, height: 54, borderRadius: '50%',
               background: 'linear-gradient(135deg,#7C3AED,#A855F7,#F3D89C)',
@@ -251,8 +272,18 @@ function Sidebar({ open, onClose, active, setActive }: {
         </nav>
 
         <div style={{ paddingTop: 12, borderTop: '1px solid rgba(168,85,247,0.12)' }}>
-          {renderItem({ label: 'Sozlamalar', icon: <Settings size={18} /> })}
+          {renderItem(SETTINGS_ITEM)}
         </div>
+
+        {notice && (
+          <div style={{
+            position: 'fixed', bottom: 20, left: 20, zIndex: 200,
+            background: 'rgba(20,14,35,0.95)', border: '1px solid rgba(168,85,247,0.4)',
+            color: '#F1E8FF', padding: '10px 18px', borderRadius: 99,
+            fontFamily: "'Nunito',sans-serif", fontSize: '0.82rem', fontWeight: 700,
+            boxShadow: '0 10px 30px rgba(0,0,0,0.5)',
+          }}>{notice}</div>
+        )}
       </aside>
     </>
   );
@@ -262,6 +293,7 @@ function Sidebar({ open, onClose, active, setActive }: {
    TOPBAR
    ──────────────────────────────────────────────────────────────────── */
 function Topbar({ onMenuClick, userName }: { onMenuClick: () => void; userName: string }) {
+  const navigate = useNavigate();
   return (
     <header style={{
       display: 'flex', alignItems: 'center', gap: 16,
@@ -309,17 +341,23 @@ function Topbar({ onMenuClick, userName }: { onMenuClick: () => void; userName: 
         }}>
           <Crown size={14} /> Premium
         </button>
-        <button aria-label="Bildirishnomalar" style={{
-          width: 40, height: 40, borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center',
-          background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(168,85,247,0.2)', cursor: 'pointer',
-        }}><Bell size={17} color="#C4B5FD" /></button>
-        <div style={{
-          width: 42, height: 42, borderRadius: '50%',
-          background: 'linear-gradient(135deg,#A855F7,#7C3AED)',
-          display: 'flex', alignItems: 'center', justifyContent: 'center',
-          fontFamily: "'Cinzel',serif", fontWeight: 700, color: '#fff', fontSize: '1rem',
-          border: '2px solid rgba(243,216,156,0.5)', flexShrink: 0,
-        }}>{userName.charAt(0).toUpperCase()}</div>
+        <button
+          aria-label="Bildirishnomalar"
+          onClick={() => navigate('/dashboard')}
+          style={{
+            width: 40, height: 40, borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center',
+            background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(168,85,247,0.2)', cursor: 'pointer',
+          }}><Bell size={17} color="#C4B5FD" /></button>
+        <button
+          onClick={() => navigate('/profile')}
+          aria-label="Profil"
+          style={{
+            width: 42, height: 42, borderRadius: '50%',
+            background: 'linear-gradient(135deg,#A855F7,#7C3AED)',
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            fontFamily: "'Cinzel',serif", fontWeight: 700, color: '#fff', fontSize: '1rem',
+            border: '2px solid rgba(243,216,156,0.5)', flexShrink: 0, cursor: 'pointer', padding: 0,
+          }}>{userName.charAt(0).toUpperCase()}</button>
       </div>
     </header>
   );
@@ -464,6 +502,7 @@ function HeroBanner() {
           </button>
 
           <button
+            onClick={() => navigate('/comicscreate')}
             style={{
               display: "flex",
               alignItems: "center",
@@ -492,6 +531,7 @@ function HeroBanner() {
    QUICK ACTIONS
    ──────────────────────────────────────────────────────────────────── */
 function QuickActions() {
+  const navigate = useNavigate();
   return (
     <section style={{ marginBottom: 'clamp(20px,3vw,32px)' }}>
       <h3 style={{
@@ -502,7 +542,7 @@ function QuickActions() {
         display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(130px,1fr))', gap: 12,
       }}>
         {QUICK_ACTIONS.map(a => (
-          <button key={a.title} style={{
+          <button key={a.title} onClick={() => navigate(a.path)} style={{
             display: 'flex', alignItems: 'center', gap: 12, textAlign: 'left',
             padding: '14px 14px', borderRadius: 14, cursor: 'pointer',
             background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(168,85,247,0.16)',
@@ -544,25 +584,31 @@ function StoryThumb({ genre }: { genre: string }) {
 }
 
 function MyStories() {
+  const navigate = useNavigate();
   return (
     <section>
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 14 }}>
         <h3 style={{ fontFamily: "'Cinzel',serif", fontWeight: 700, fontSize: 'clamp(1rem,1.8vw,1.15rem)', color: '#F1E8FF' }}>
           Mening hikoyalarim
         </h3>
-        <a href="#" style={{ display: 'flex', alignItems: 'center', gap: 4, fontFamily: "'Nunito',sans-serif", fontSize: '0.82rem', color: '#A855F7', textDecoration: 'none' }}>
+        <button
+          onClick={() => navigate('/stories')}
+          style={{ display: 'flex', alignItems: 'center', gap: 4, fontFamily: "'Nunito',sans-serif", fontSize: '0.82rem', color: '#A855F7', background: 'none', border: 'none', cursor: 'pointer', padding: 0 }}
+        >
           Barchasi <ChevronRight size={14} />
-        </a>
+        </button>
       </div>
       <div style={{
         display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(180px,1fr))', gap: 16,
       }}>
         {STORIES.map(s => (
-          <div key={s.title} style={{
-            borderRadius: 16, overflow: 'hidden',
-            background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(168,85,247,0.16)',
-            transition: 'all 0.25s ease', cursor: 'pointer',
-          }}
+          <div key={s.title}
+            onClick={() => navigate('/stories')}
+            style={{
+              borderRadius: 16, overflow: 'hidden',
+              background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(168,85,247,0.16)',
+              transition: 'all 0.25s ease', cursor: 'pointer',
+            }}
             onMouseEnter={e => { e.currentTarget.style.transform = 'translateY(-4px)'; e.currentTarget.style.borderColor = 'rgba(168,85,247,0.45)'; }}
             onMouseLeave={e => { e.currentTarget.style.transform = 'translateY(0)'; e.currentTarget.style.borderColor = 'rgba(168,85,247,0.16)'; }}
           >
@@ -592,11 +638,13 @@ function MyStories() {
           </div>
         ))}
         {/* Add card */}
-        <button style={{
-          borderRadius: 16, border: '1.5px dashed rgba(168,85,247,0.35)', background: 'rgba(168,85,247,0.04)',
-          display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 10,
-          minHeight: 200, cursor: 'pointer', color: '#B79FE0',
-        }}
+        <button
+          onClick={() => navigate('/storiecreate')}
+          style={{
+            borderRadius: 16, border: '1.5px dashed rgba(168,85,247,0.35)', background: 'rgba(168,85,247,0.04)',
+            display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 10,
+            minHeight: 200, cursor: 'pointer', color: '#B79FE0',
+          }}
           onMouseEnter={e => { e.currentTarget.style.background = 'rgba(168,85,247,0.1)'; e.currentTarget.style.borderColor = 'rgba(168,85,247,0.6)'; }}
           onMouseLeave={e => { e.currentTarget.style.background = 'rgba(168,85,247,0.04)'; e.currentTarget.style.borderColor = 'rgba(168,85,247,0.35)'; }}
         >
@@ -615,6 +663,7 @@ function MyStories() {
    RIGHT RAIL
    ──────────────────────────────────────────────────────────────────── */
 function GenresCard() {
+  const navigate = useNavigate();
   return (
     <div style={{
       borderRadius: 18, background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(168,85,247,0.16)',
@@ -622,14 +671,16 @@ function GenresCard() {
     }}>
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 14 }}>
         <h4 style={{ fontFamily: "'Cinzel',serif", fontWeight: 700, fontSize: '0.98rem', color: '#F1E8FF' }}>Janrlar</h4>
-        <a href="#" style={{ fontFamily: "'Nunito',sans-serif", fontSize: '0.75rem', color: '#A855F7', textDecoration: 'none' }}>Barchasi</a>
+        <button onClick={() => navigate('/stories')} style={{ fontFamily: "'Nunito',sans-serif", fontSize: '0.75rem', color: '#A855F7', background: 'none', border: 'none', cursor: 'pointer', padding: 0 }}>Barchasi</button>
       </div>
       <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
         {GENRES.map(g => (
-          <div key={g.name} style={{
-            display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-            padding: '8px 8px', borderRadius: 10, cursor: 'pointer', transition: 'background 0.15s',
-          }}
+          <div key={g.name}
+            onClick={() => navigate('/stories')}
+            style={{
+              display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+              padding: '8px 8px', borderRadius: 10, cursor: 'pointer', transition: 'background 0.15s',
+            }}
             onMouseEnter={e => (e.currentTarget.style.background = 'rgba(168,85,247,0.08)')}
             onMouseLeave={e => (e.currentTarget.style.background = 'transparent')}
           >
@@ -645,6 +696,7 @@ function GenresCard() {
 }
 
 function ParentsCard() {
+  const navigate = useNavigate();
   return (
     <div style={{
       borderRadius: 18, background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(168,85,247,0.16)',
@@ -656,10 +708,12 @@ function ParentsCard() {
       </div>
       <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
         {PARENTS_NAV.map(p => (
-          <div key={p.label} style={{
-            display: 'flex', alignItems: 'flex-start', gap: 12,
-            padding: '10px 8px', borderRadius: 10, cursor: 'pointer', transition: 'background 0.15s',
-          }}
+          <div key={p.label}
+            onClick={() => navigate(p.path!)}
+            style={{
+              display: 'flex', alignItems: 'flex-start', gap: 12,
+              padding: '10px 8px', borderRadius: 10, cursor: 'pointer', transition: 'background 0.15s',
+            }}
             onMouseEnter={e => (e.currentTarget.style.background = 'rgba(168,85,247,0.08)')}
             onMouseLeave={e => (e.currentTarget.style.background = 'transparent')}
           >
@@ -674,12 +728,14 @@ function ParentsCard() {
           </div>
         ))}
       </div>
-      <button style={{
-        width: '100%', marginTop: 14, padding: '10px', borderRadius: 10, border: 'none', cursor: 'pointer',
-        background: 'rgba(168,85,247,0.14)', color: '#D8B4FE',
-        fontFamily: "'Nunito',sans-serif", fontWeight: 700, fontSize: '0.8rem',
-        display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6,
-      }}>Batafsil bo'limga o'tish <ChevronRight size={14} /></button>
+      <button
+        onClick={() => navigate('/parents')}
+        style={{
+          width: '100%', marginTop: 14, padding: '10px', borderRadius: 10, border: 'none', cursor: 'pointer',
+          background: 'rgba(168,85,247,0.14)', color: '#D8B4FE',
+          fontFamily: "'Nunito',sans-serif", fontWeight: 700, fontSize: '0.8rem',
+          display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6,
+        }}>Batafsil bo'limga o'tish <ChevronRight size={14} /></button>
     </div>
   );
 }
@@ -688,6 +744,7 @@ function ParentsCard() {
    BOTTOM BANNER ---------*/
    
     function BottomBanner() {
+  const navigate = useNavigate();
   return (
     <section
       style={{
@@ -787,6 +844,7 @@ function ParentsCard() {
 
       {/* Button */}
       <button
+        onClick={() => navigate('/parents')}
         style={{
           position: "relative",
           zIndex: 2,
