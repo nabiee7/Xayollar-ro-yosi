@@ -17,9 +17,6 @@ const IMAGES = {
   parentsBanner: '/oila.png',   
 };
 
-// `path` is the route this item navigates to (taken from App.tsx).
-// Leave it out for items that don't have a page yet — they show a
-// "coming soon" notice instead of navigating.
 interface NavItem { label: string; icon: React.ReactNode; path?: string; }
 
 const MAIN_NAV: NavItem[] = [
@@ -31,8 +28,8 @@ const MAIN_NAV: NavItem[] = [
   { label: 'Rasmlar galereyasi', icon: <Images size={18} />, path: '/gallery' },
   { label: 'Ovozlar', icon: <Mic size={18} />, path: '/voice' },
   { label: 'Musiqa', icon: <Music2 size={18} />, path: '/music' },
-  { label: 'Jonlantirish', icon: <Sparkles size={18} />, path: '/drawing' },
-  { label: 'Videolar', icon: <Video size={18} />, path: '/videocreate' },
+  { label: 'Chizish', icon: <Sparkles size={18} />, path: '/drawing' },
+  { label: 'Video jonlantirish', icon: <Video size={18} />, path: '/videocreate' },
   { label: 'Sevimlilar', icon: <Heart size={18} />, path: '/favorites' },
   { label: 'Fikrlar va sharhlar', icon: <MessageSquare size={18} /> },
   { label: 'Bildirishnomalar', icon: <Bell size={18} /> },
@@ -61,7 +58,7 @@ const QUICK_ACTIONS: QuickAction[] = [
   { title: 'Rasm chizish', sub: 'Canvas', icon: <PenLine size={20} />, path: '/drawing' },
   { title: 'Ovoz yozish', sub: 'Studio', icon: <Mic size={20} />, path: '/voice' },
   { title: "Musiqa qo'shish", sub: 'Kutubxona', icon: <Music2 size={20} />, path: '/music' },
-  { title: 'Jonlantirish', sub: 'Animate', icon: <Sparkles size={20} />, path: '/drawing' },
+  { title: 'Chizish', sub: 'Animate', icon: <Sparkles size={20} />, path: '/drawing' },
   { title: 'Video yaratish', sub: 'Render', icon: <Video size={20} />, path: '/videocreate' },
   { title: 'Galereya', sub: 'Mening rasmlarim', icon: <Images size={20} />, path: '/gallery' },
   { title: 'Sevimlilar', sub: 'Saqlanganlar', icon: <Heart size={20} />, path: '/favorites' },
@@ -103,11 +100,6 @@ function useMediaQuery(query: string) {
   return matches;
 }
 
-/* ────────────────────────────────────────────────────────────────────────
-   AMBIENT STARS — butun sahifa fonida sekin qimirlab/miltillab turadigan
-   yulduzchalar. position:fixed bo'lgani uchun barcha bo'limlar ortida
-   ko'rinadi va scroll bilan birga qoladi.
-   ──────────────────────────────────────────────────────────────────── */
 function AmbientStars() {
   const stars = React.useMemo(() => {
     return Array.from({ length: 55 }).map((_, i) => {
@@ -175,8 +167,7 @@ function Sidebar({ open, onClose, active, setActive }: {
   };
 
   const renderItem = (item: NavItem) => {
-    // Items with a route are highlighted based on the actual current URL,
-    // so the highlight stays correct even after a refresh or direct link.
+   
     const isActive = item.path ? location.pathname === item.path : active === item.label;
     return (
       <button
